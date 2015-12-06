@@ -1,0 +1,1 @@
+# Sync Settings Shortcuts/Locale-Plugin

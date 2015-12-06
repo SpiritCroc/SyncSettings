@@ -1,0 +1,53 @@
+<!--
+    Copyright (C) 2015 SpiritCroc
+    Email: spiritcroc@gmail.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<resources>
+    <string name="app_name">Sync Settings</string>
+    <string name="activity_select_sync">Select account/data</string>
+
+    <string name="enter_shortcut_name">Enter shortcut name:</string>
+
+    <string name="on">On</string>
+    <string name="off">Off</string>
+    <string name="toggle">Toggle</string>
+
+    <string name="sync_master">Master auto sync (all accounts)</string>
+    <string name="sync_master_on">@string/on</string>
+    <string name="sync_master_off">@string/off</string>
+    <string name="sync_master_toggle">@string/toggle</string>
+
+    <string name="sync_now">Request sync:</string>
+    <string name="auto_sync">Auto sync:</string>
+    <string name="button_sync_now">If auto sync enabled</string>
+    <string name="button_force_sync_now">Force</string>
+    <string name="button_on">@string/on</string>
+    <string name="button_off">@string/off</string>
+    <string name="button_toggle">@string/toggle</string>
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Cancel</string>
+
+    <string name="shortcut_sync_now">Sync %1$s (%2$s)</string>
+    <string name="shortcut_auto_sync_on">Enable sync %1$s (%2$s)</string>
+    <string name="shortcut_auto_sync_off">Disable sync %1$s (%2$s)</string>
+    <string name="shortcut_auto_sync_toggle">Toggle sync %1$s (%2$s)</string>
+    <string name="shortcut_sync_master_on">Enable auto sync</string>
+    <string name="shortcut_sync_master_off">Disable auto sync</string>
+    <string name="shortcut_sync_master_toggle">Toggle auto sync</string>
+
+    <string name="toast_an_error_occurred">Sync Settings: An error occurred</string>
+</resources>

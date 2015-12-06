@@ -22,6 +22,8 @@ public abstract class Constants {
 
     public static final String LOCALE_ACTION_FIRE_SETTING
             = "com.twofortyfouram.locale.intent.action.FIRE_SETTING";
+    public static final String LOCALE_EXTRA_STRING_BLURB =
+            "com.twofortyfouram.locale.intent.extra.BLURB";
 
     // According to the AOSP browser code, there is no public string defining this intent so if Home
     // changes the value, this string has to get updated:
@@ -33,8 +35,6 @@ public abstract class Constants {
             "de.spiritcroc.syncsettings.extra.ACCOUNT";
     public static final String EXTRA_AUTHORITY =
             "de.spiritcroc.syncsettings.extra.AUTHORITY";
-    public static final String EXTRA_SHORTCUT_NAME =
-            "de.spiritcroc.syncsettings.extra.SHORTCUT_NAME";
 
     public static final String ACTION_MASTER_SYNC_ON =
             "de.spiritcroc.syncsettings.action.MASTER_SYNC_ON";

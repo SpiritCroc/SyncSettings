@@ -101,7 +101,7 @@ public class ShortcutActivity extends AppCompatActivity implements View.OnClickL
             data.setClass(getApplicationContext(), ShortcutActivity.class);
             resultIntent = new Intent(Constants.INSTALL_SHORTCUT);
             resultIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, data);
-            String shortcutName = data.getStringExtra(Constants.EXTRA_SHORTCUT_NAME);
+            String shortcutName = data.getStringExtra(Constants.LOCALE_EXTRA_STRING_BLURB);
             editShortcutText.setText(shortcutName);
             resultIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                     Intent.ShortcutIconResource

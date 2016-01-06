@@ -31,8 +31,11 @@ public abstract class Constants {
 
     public static final String EXTRA_ACTION =
             "de.spiritcroc.syncsettings.extra.ACTION";
+    @Deprecated // Use EXTRA_ACCOUNT_STRING instead
     public static final String EXTRA_ACCOUNT =
             "de.spiritcroc.syncsettings.extra.ACCOUNT";
+    public static final String EXTRA_ACCOUNT_STRING =
+            "de.spiritcroc.syncsettings.extra.ACCOUNT_STRING";
     public static final String EXTRA_AUTHORITY =
             "de.spiritcroc.syncsettings.extra.AUTHORITY";
 

@@ -47,7 +47,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
         setContentView(R.layout.activity_select_action);
 
         Intent creationIntent = getIntent();
-        account = creationIntent.getParcelableExtra(Constants.EXTRA_ACCOUNT);
+        account= Util.getAccountFromIntent(this, creationIntent);
         authority = creationIntent.getStringExtra(Constants.EXTRA_AUTHORITY);
 
         if (account == null) {
@@ -85,7 +85,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void onClick(View view) {
         Intent result = new Intent();
-        result.putExtra(Constants.EXTRA_ACCOUNT, account/*.toString()*/);
+        result.putExtra(Constants.EXTRA_ACCOUNT_STRING, account.toString());
         result.putExtra(Constants.EXTRA_AUTHORITY, authority);
 
         if (view.equals(syncNowButton)) {

@@ -19,6 +19,7 @@
 package de.spiritcroc.syncsettings;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -56,16 +57,7 @@ public abstract class Util {
             Log.w(LOG_TAG, "handleAction: intent has no action set");
             return;
         }
-        /*String accountString = intent.getStringExtra(EXTRA_ACCOUNT);
-        Account[] accounts = AccountManager.get(context.getApplicationContext()).getAccounts();
-        Account account = null;
-        for (Account tmpAccount: accounts) {
-            if (tmpAccount.toString().equals(accountString)) {
-                account = tmpAccount;
-                break;
-            }
-        }*/
-        Account account = intent.getParcelableExtra(Constants.EXTRA_ACCOUNT);
+        Account account = getAccountFromIntent(context, intent);
         String authority = intent.getStringExtra(Constants.EXTRA_AUTHORITY);
         switch (action) {
             case Constants.ACTION_MASTER_SYNC_ON:
@@ -105,6 +97,27 @@ public abstract class Util {
             default:
                 Log.w(LOG_TAG, "handleAction: Unknown action: " + intent.getAction());
                 break;
+        }
+    }
+
+    public static Account getAccountFromIntent(Context context, Intent intent) {
+        if (intent.hasExtra(Constants.EXTRA_ACCOUNT_STRING)) {
+            String accountString = intent.getStringExtra(Constants.EXTRA_ACCOUNT_STRING);
+            Account[] accounts = AccountManager.get(context.getApplicationContext()).getAccounts();
+            for (Account account: accounts) {
+                if (account.toString().equals(accountString)) {
+                    return account;
+                }
+            }
+            Log.i(LOG_TAG, "getAccountFromIntent: could not recover account " + accountString);
+            return null;
+        } else if (intent.hasExtra(Constants.EXTRA_ACCOUNT)) {
+            // Compatibility with intents from app with versionCode <= 2
+            Log.d(LOG_TAG, "getAccountFromIntent: Use old way to get account from intent");
+            return intent.getParcelableExtra(Constants.EXTRA_ACCOUNT);
+        } else {
+            Log.d(LOG_TAG, "getAccountFromIntent: No account extra found in intent");
+            return null;
         }
     }
 

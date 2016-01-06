@@ -139,7 +139,8 @@ public class SelectSyncActivity extends AppCompatActivity {
                         } else {
                             Intent intent =
                                     new Intent(SelectSyncActivity.this, SelectActionActivity.class);
-                            intent.putExtra(Constants.EXTRA_ACCOUNT, clickedSync.account);
+                            intent.putExtra(Constants.EXTRA_ACCOUNT_STRING,
+                                    clickedSync.account.toString());
                             intent.putExtra(Constants.EXTRA_AUTHORITY, clickedSync.authority);
                             startActivityForResult(intent, REQUEST_SELECT_ACTION);
                             break;

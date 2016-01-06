@@ -139,16 +139,43 @@ public abstract class Util {
     }
 
     public static void autoSyncOn(Account account, String authority) {
+        if (DEBUG) {
+            Log.d(LOG_TAG, "sync on " + account + ", " + authority);
+            Log.d(LOG_TAG, "previous " +
+                    ContentResolver.getSyncAutomatically(account, authority));
+        }
         ContentResolver.setSyncAutomatically(account, authority, true);
+        if (DEBUG) {
+            Log.d("syncsettings", "now " +
+                    ContentResolver.getSyncAutomatically(account, authority));
+        }
     }
 
     public static void autoSyncOff(Account account, String authority) {
+        if (DEBUG) {
+            Log.d(LOG_TAG, "sync off " + account + ", " + authority);
+            Log.d(LOG_TAG, "previous " +
+                    ContentResolver.getSyncAutomatically(account, authority));
+        }
         ContentResolver.setSyncAutomatically(account, authority, false);
+        if (DEBUG) {
+            Log.d("syncsettings", "now " +
+                    ContentResolver.getSyncAutomatically(account, authority));
+        }
     }
 
     public static void autoSyncToggle(Account account, String authority) {
+        if (DEBUG) {
+            Log.d(LOG_TAG, "sync toggle " + account + ", " + authority);
+            Log.d(LOG_TAG, "previous " +
+                    ContentResolver.getSyncAutomatically(account, authority));
+        }
         boolean autoSync = ContentResolver.getSyncAutomatically(account, authority);
         ContentResolver.setSyncAutomatically(account, authority, !autoSync);
+        if (DEBUG) {
+            Log.d("syncsettings", "now " +
+                    ContentResolver.getSyncAutomatically(account, authority));
+        }
     }
 
     public static void autoMasterSyncOn() {

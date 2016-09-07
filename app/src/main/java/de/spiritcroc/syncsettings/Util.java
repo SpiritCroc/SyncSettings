@@ -105,7 +105,9 @@ public abstract class Util {
             String accountString = intent.getStringExtra(Constants.EXTRA_ACCOUNT_STRING);
             Account[] accounts = AccountManager.get(context.getApplicationContext()).getAccounts();
             for (Account account: accounts) {
+                if (BuildConfig.DEBUG) Log.v(LOG_TAG, "Found account " + account.toString());
                 if (account.toString().equals(accountString)) {
+                    if (BuildConfig.DEBUG) Log.v(LOG_TAG, "Found account to use");
                     return account;
                 }
             }

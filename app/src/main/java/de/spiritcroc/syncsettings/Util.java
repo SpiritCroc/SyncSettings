@@ -109,7 +109,7 @@ public abstract class Util {
                     return account;
                 }
             }
-            Log.i(LOG_TAG, "getAccountFromIntent: could not recover account " + accountString);
+            Log.e(LOG_TAG, "getAccountFromIntent: could not recover account " + accountString);
             return null;
         } else if (intent.hasExtra(Constants.EXTRA_ACCOUNT)) {
             // Compatibility with intents from app with versionCode <= 2

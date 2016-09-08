@@ -42,6 +42,7 @@
     <string name="button_cancel">Cancel</string>
 
     <string name="shortcut_sync_now">Sync %1$s (%2$s)</string>
+    <string name="shortcut_force_sync_now">Force sync %1$s (%2$s)</string>
     <string name="shortcut_auto_sync_on">Enable sync %1$s (%2$s)</string>
     <string name="shortcut_auto_sync_off">Disable sync %1$s (%2$s)</string>
     <string name="shortcut_auto_sync_toggle">Toggle sync %1$s (%2$s)</string>

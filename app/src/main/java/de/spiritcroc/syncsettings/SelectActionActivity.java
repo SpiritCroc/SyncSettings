@@ -98,7 +98,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
         } else if (view.equals(forceSyncNowButton)) {
             result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_FORCE_SYNC_NOW);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
-                    getString(R.string.shortcut_sync_now, account.name, authority)
+                    getString(R.string.shortcut_force_sync_now, account.name, authority)
             );
         } else if (view.equals(autoSyncOnButton)) {
             Util.maybeRequestPermissions(this,

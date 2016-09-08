@@ -86,7 +86,8 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View view) {
         Intent result = new Intent();
         result.putExtra(Constants.EXTRA_ACCOUNT_STRING, account.toString());
-        if (BuildConfig.DEBUG) Log.v(LOG_TAG, "put extra for intent: EXTRA_ACCOUNT_STRING=" + account.toString());
+        if (BuildConfig.DEBUG)
+            Log.v(LOG_TAG, "put extra for intent: EXTRA_ACCOUNT_STRING=" + account.toString());
         result.putExtra(Constants.EXTRA_AUTHORITY, authority);
         if (BuildConfig.DEBUG) Log.v(LOG_TAG, "put extra for intent: EXTRA_AUTHORITY=" + authority);
 

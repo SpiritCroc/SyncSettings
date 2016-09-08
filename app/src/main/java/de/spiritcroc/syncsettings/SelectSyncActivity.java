@@ -101,7 +101,8 @@ public class SelectSyncActivity extends AppCompatActivity {
                                 new String[]{Manifest.permission.READ_SYNC_SETTINGS,
                                         Manifest.permission.WRITE_SYNC_SETTINGS}
                         );
-                        result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_MASTER_SYNC_TOGGLE);
+                        result.putExtra(Constants.EXTRA_ACTION,
+                                Constants.ACTION_MASTER_SYNC_TOGGLE);
                         result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                                 getString(R.string.shortcut_sync_master_toggle)
                         );

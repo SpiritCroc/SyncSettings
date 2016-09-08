@@ -89,7 +89,8 @@ public class ShortcutActivity extends AppCompatActivity implements View.OnClickL
         editShortcutText.postDelayed(new Runnable() {
             @Override
             public void run() {
-                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                InputMethodManager imm =
+                        (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                 imm.showSoftInput(editShortcutText, InputMethodManager.SHOW_IMPLICIT);
             }
         }, 500);
@@ -101,7 +102,8 @@ public class ShortcutActivity extends AppCompatActivity implements View.OnClickL
             data.setClass(getApplicationContext(), ShortcutActivity.class);
             resultIntent = new Intent(Constants.INSTALL_SHORTCUT);
             resultIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, data);
-            String shortcutName = data.getStringExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB);
+            String shortcutName =
+                    data.getStringExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB);
             editShortcutText.setText(shortcutName);
             resultIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                     Intent.ShortcutIconResource

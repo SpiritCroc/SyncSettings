@@ -31,7 +31,7 @@ public class BReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (DEBUG) Log.d(LOG_TAG, "onReceive");
 
-        if (Constants.LOCALE_ACTION_FIRE_SETTING.equals(intent.getAction())) {
+        if (com.twofortyfouram.locale.api.Intent.ACTION_FIRE_SETTING.equals(intent.getAction())) {
             Util.handleAction(context, intent);
         }
     }

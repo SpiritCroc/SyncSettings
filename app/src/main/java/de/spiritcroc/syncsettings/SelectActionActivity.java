@@ -92,12 +92,12 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
 
         if (view.equals(syncNowButton)) {
             result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_SYNC_NOW);
-            result.putExtra(Constants.LOCALE_EXTRA_STRING_BLURB,
+            result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     getString(R.string.shortcut_sync_now, account.name, authority)
             );
         } else if (view.equals(forceSyncNowButton)) {
             result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_FORCE_SYNC_NOW);
-            result.putExtra(Constants.LOCALE_EXTRA_STRING_BLURB,
+            result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     getString(R.string.shortcut_sync_now, account.name, authority)
             );
         } else if (view.equals(autoSyncOnButton)) {
@@ -105,7 +105,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
                     new String[]{Manifest.permission.WRITE_SYNC_SETTINGS}
             );
             result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_ON);
-            result.putExtra(Constants.LOCALE_EXTRA_STRING_BLURB,
+            result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     getString(R.string.shortcut_auto_sync_on, account.name, authority)
             );
         } else if (view.equals(autoSyncOffButton)) {
@@ -113,7 +113,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
                     new String[]{Manifest.permission.WRITE_SYNC_SETTINGS}
             );
             result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_OFF);
-            result.putExtra(Constants.LOCALE_EXTRA_STRING_BLURB,
+            result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     getString(R.string.shortcut_auto_sync_off, account.name, authority)
             );
         } else if (view.equals(autoSyncToggleButton)) {
@@ -122,7 +122,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
                             Manifest.permission.WRITE_SYNC_SETTINGS}
             );
             result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_TOGGLE);
-            result.putExtra(Constants.LOCALE_EXTRA_STRING_BLURB,
+            result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     getString(R.string.shortcut_auto_sync_toggle, account.name, authority)
             );
         } else {

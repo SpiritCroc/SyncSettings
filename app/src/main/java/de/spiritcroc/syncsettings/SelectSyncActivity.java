@@ -85,7 +85,7 @@ public class SelectSyncActivity extends AppCompatActivity {
                                 new String[]{Manifest.permission.WRITE_SYNC_SETTINGS}
                         );
                         result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_MASTER_SYNC_ON);
-                        result.putExtra(Constants.LOCALE_EXTRA_STRING_BLURB,
+                        result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                                 getString(R.string.shortcut_sync_master_on)
                         );
                     } else if (getString(R.string.sync_master_off).equals(action)) {
@@ -93,7 +93,7 @@ public class SelectSyncActivity extends AppCompatActivity {
                                 new String[]{Manifest.permission.WRITE_SYNC_SETTINGS}
                         );
                         result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_MASTER_SYNC_OFF);
-                        result.putExtra(Constants.LOCALE_EXTRA_STRING_BLURB,
+                        result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                                 getString(R.string.shortcut_sync_master_off)
                         );
                     } else if (getString(R.string.sync_master_toggle).equals(action)) {
@@ -102,7 +102,7 @@ public class SelectSyncActivity extends AppCompatActivity {
                                         Manifest.permission.WRITE_SYNC_SETTINGS}
                         );
                         result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_MASTER_SYNC_TOGGLE);
-                        result.putExtra(Constants.LOCALE_EXTRA_STRING_BLURB,
+                        result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                                 getString(R.string.shortcut_sync_master_toggle)
                         );
                     } else {

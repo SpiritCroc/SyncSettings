@@ -7,8 +7,8 @@ android {
         applicationId 'de.spiritcroc.syncsettings'
         minSdkVersion 9
         targetSdkVersion 24
-        versionCode 3
-        versionName "1.1"
+        versionCode 4
+        versionName "1.2"
     }
     buildTypes {
         release {

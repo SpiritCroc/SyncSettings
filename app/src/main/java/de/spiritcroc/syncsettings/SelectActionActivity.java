@@ -85,19 +85,20 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void onClick(View view) {
         Intent result = new Intent();
-        result.putExtra(Constants.EXTRA_ACCOUNT_STRING, account.toString());
+        Bundle localeBundle = new Bundle();
+        localeBundle.putString(Constants.EXTRA_ACCOUNT_STRING, account.toString());
         if (BuildConfig.DEBUG)
             Log.v(LOG_TAG, "put extra for intent: EXTRA_ACCOUNT_STRING=" + account.toString());
-        result.putExtra(Constants.EXTRA_AUTHORITY, authority);
+        localeBundle.putString(Constants.EXTRA_AUTHORITY, authority);
         if (BuildConfig.DEBUG) Log.v(LOG_TAG, "put extra for intent: EXTRA_AUTHORITY=" + authority);
 
         if (view.equals(syncNowButton)) {
-            result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_SYNC_NOW);
+            localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_SYNC_NOW);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     getString(R.string.shortcut_sync_now, account.name, authority)
             );
         } else if (view.equals(forceSyncNowButton)) {
-            result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_FORCE_SYNC_NOW);
+            localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_FORCE_SYNC_NOW);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     getString(R.string.shortcut_force_sync_now, account.name, authority)
             );
@@ -105,7 +106,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
             Util.maybeRequestPermissions(this,
                     new String[]{Manifest.permission.WRITE_SYNC_SETTINGS}
             );
-            result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_ON);
+            localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_ON);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     getString(R.string.shortcut_auto_sync_on, account.name, authority)
             );
@@ -113,7 +114,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
             Util.maybeRequestPermissions(this,
                     new String[]{Manifest.permission.WRITE_SYNC_SETTINGS}
             );
-            result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_OFF);
+            localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_OFF);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     getString(R.string.shortcut_auto_sync_off, account.name, authority)
             );
@@ -122,7 +123,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
                     new String[]{Manifest.permission.READ_SYNC_SETTINGS,
                             Manifest.permission.WRITE_SYNC_SETTINGS}
             );
-            result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_TOGGLE);
+            localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_TOGGLE);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     getString(R.string.shortcut_auto_sync_toggle, account.name, authority)
             );
@@ -130,6 +131,8 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
             Log.w(LOG_TAG, "onClick for unknown view");
             return;// Don't finish
         }
+
+        result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE, localeBundle);
 
         finishWithResult(result);
     }

@@ -53,12 +53,29 @@ public abstract class Util {
 
     public static void handleAction(Context context, Intent intent) {
         String action = intent.getStringExtra(Constants.EXTRA_ACTION);
+        Account account;
+        String authority;
         if (action == null) {
-            Log.w(LOG_TAG, "handleAction: intent has no action set");
-            return;
+            Bundle localeBundle =
+                    intent.getBundleExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE);
+            if (localeBundle == null) {
+                Log.e(LOG_TAG, "handleAction: intent missing EXTRA_BUNDLE");
+                return;
+            }
+            action = localeBundle.getString(Constants.EXTRA_ACTION);
+            if (action == null) {
+                Log.e(LOG_TAG, "handleAction: EXTRA_BUNDLE missing action");
+                return;
+            }
+
+            account = getAccountFromBundle(context, localeBundle);
+            authority = localeBundle.getString(Constants.EXTRA_AUTHORITY);
+        } else {
+            Log.d(LOG_TAG, "Using deprecated way of getting instructions from intent");
+
+            account = getAccountFromIntent(context, intent);
+            authority = intent.getStringExtra(Constants.EXTRA_AUTHORITY);
         }
-        Account account = getAccountFromIntent(context, intent);
-        String authority = intent.getStringExtra(Constants.EXTRA_AUTHORITY);
         switch (action) {
             case Constants.ACTION_MASTER_SYNC_ON:
                 Util.autoMasterSyncOn();
@@ -100,19 +117,14 @@ public abstract class Util {
         }
     }
 
+    /**
+     * @deprecated Use getAccountFromBundle instead
+     */
+    @Deprecated
     public static Account getAccountFromIntent(Context context, Intent intent) {
         if (intent.hasExtra(Constants.EXTRA_ACCOUNT_STRING)) {
             String accountString = intent.getStringExtra(Constants.EXTRA_ACCOUNT_STRING);
-            Account[] accounts = AccountManager.get(context.getApplicationContext()).getAccounts();
-            for (Account account: accounts) {
-                if (BuildConfig.DEBUG) Log.v(LOG_TAG, "Found account " + account.toString());
-                if (account.toString().equals(accountString)) {
-                    if (BuildConfig.DEBUG) Log.v(LOG_TAG, "Found account to use");
-                    return account;
-                }
-            }
-            Log.e(LOG_TAG, "getAccountFromIntent: could not recover account " + accountString);
-            return null;
+            return getAccount(context, accountString);
         } else if (intent.hasExtra(Constants.EXTRA_ACCOUNT)) {
             // Compatibility with intents from app with versionCode <= 2
             Log.d(LOG_TAG, "getAccountFromIntent: Use old way to get account from intent");
@@ -121,6 +133,29 @@ public abstract class Util {
             Log.d(LOG_TAG, "getAccountFromIntent: No account extra found in intent");
             return null;
         }
+    }
+
+    public static Account getAccountFromBundle(Context context, Bundle bundle) {
+        if (bundle.containsKey(Constants.EXTRA_ACCOUNT_STRING)) {
+            String accountString = bundle.getString(Constants.EXTRA_ACCOUNT_STRING);
+            return getAccount(context, accountString);
+        } else {
+            Log.d(LOG_TAG, "getAccountFromIntent: No account extra found in intent");
+            return null;
+        }
+    }
+
+    private static Account getAccount(Context context, String accountString){
+        Account[] accounts = AccountManager.get(context.getApplicationContext()).getAccounts();
+        for (Account account: accounts) {
+            if (BuildConfig.DEBUG) Log.v(LOG_TAG, "Found account " + account.toString());
+            if (account.toString().equals(accountString)) {
+                if (BuildConfig.DEBUG) Log.v(LOG_TAG, "Found account to use");
+                return account;
+            }
+        }
+        Log.e(LOG_TAG, "getAccount: could not recover account " + accountString);
+        return null;
     }
 
     private static boolean accountAndAuthorityValid(Context context, Account account,

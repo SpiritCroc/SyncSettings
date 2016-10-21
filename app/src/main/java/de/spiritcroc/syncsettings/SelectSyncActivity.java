@@ -80,11 +80,12 @@ public class SelectSyncActivity extends AppCompatActivity {
                     // Master sync settings
                     String action = syncs.get(childPosition).authority;
                     Intent result = new Intent();
+                    Bundle localeBundle = new Bundle();
                     if (getString(R.string.sync_master_on).equals(action)) {
                         Util.maybeRequestPermissions(SelectSyncActivity.this,
                                 new String[]{Manifest.permission.WRITE_SYNC_SETTINGS}
                         );
-                        result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_MASTER_SYNC_ON);
+                        localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_MASTER_SYNC_ON);
                         result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                                 getString(R.string.shortcut_sync_master_on)
                         );
@@ -92,7 +93,7 @@ public class SelectSyncActivity extends AppCompatActivity {
                         Util.maybeRequestPermissions(SelectSyncActivity.this,
                                 new String[]{Manifest.permission.WRITE_SYNC_SETTINGS}
                         );
-                        result.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_MASTER_SYNC_OFF);
+                        localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_MASTER_SYNC_OFF);
                         result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                                 getString(R.string.shortcut_sync_master_off)
                         );
@@ -101,7 +102,7 @@ public class SelectSyncActivity extends AppCompatActivity {
                                 new String[]{Manifest.permission.READ_SYNC_SETTINGS,
                                         Manifest.permission.WRITE_SYNC_SETTINGS}
                         );
-                        result.putExtra(Constants.EXTRA_ACTION,
+                        localeBundle.putString(Constants.EXTRA_ACTION,
                                 Constants.ACTION_MASTER_SYNC_TOGGLE);
                         result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                                 getString(R.string.shortcut_sync_master_toggle)
@@ -110,6 +111,7 @@ public class SelectSyncActivity extends AppCompatActivity {
                         Log.w(LOG_TAG, "Could not find master action " + action);
                         return false;
                     }
+                    result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE, localeBundle);
                     finishWithResult(result);
                     return true;
                 }

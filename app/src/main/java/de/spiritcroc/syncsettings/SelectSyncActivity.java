@@ -47,7 +47,7 @@ import java.util.Map;
 
 public class SelectSyncActivity extends AppCompatActivity {
     private static final String LOG_TAG = SelectSyncActivity.class.getSimpleName();
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final int REQUEST_SELECT_ACTION = 1;
     private static final int REQUEST_PERMISSION_GET_ACCOUNTS = 2;
@@ -153,6 +153,18 @@ public class SelectSyncActivity extends AppCompatActivity {
         });
 
         loadSyncs(false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (DEBUG) Log.d(LOG_TAG, "onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (DEBUG) Log.d(LOG_TAG, "onPause");
     }
 
     @Override

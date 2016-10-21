@@ -36,7 +36,7 @@ import java.util.ArrayList;
 
 public abstract class Util {
     private static final String LOG_TAG = Util.class.getSimpleName();
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     public static ArrayList<String> getAuthorities() {
         SyncAdapterType[] syncAdapterTypes = ContentResolver.getSyncAdapterTypes();

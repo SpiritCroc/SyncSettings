@@ -60,5 +60,4 @@
     <string name="shortcut_sync_master_toggle">Toggle auto sync</string>
 
     <string name="toast_an_error_occurred">Sync Settings: An error occurred</string>
-    <string name="toast_one_selection_required">At least one selection required!</string>
 </resources>

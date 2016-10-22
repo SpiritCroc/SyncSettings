@@ -36,7 +36,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ExpandableListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,7 +104,7 @@ public class SelectSyncActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.next).setVisible(multiSelectMode);
+        menu.findItem(R.id.next).setVisible(multiSelectMode && !multiSelectSyncs.isEmpty());
         menu.findItem(R.id.multi_select).setChecked(multiSelectMode);
         return super.onPrepareOptionsMenu(menu);
     }
@@ -340,10 +339,14 @@ public class SelectSyncActivity extends AppCompatActivity {
             if (clickedSync.account == null) {
                 // Master sync setting
             } else if (multiSelectMode) {
+                boolean previousEmpty = multiSelectSyncs.isEmpty();
                 if (cb.isChecked()) {
                     multiSelectSyncs.add(clickedSync);
                 } else {
                     multiSelectSyncs.remove(clickedSync);
+                }
+                if (previousEmpty != multiSelectSyncs.isEmpty()) {
+                    invalidateOptionsMenu();
                 }
                 if (DEBUG) {
                     Log.v(LOG_TAG, "Selected syncs:");
@@ -368,9 +371,7 @@ public class SelectSyncActivity extends AppCompatActivity {
     }
 
     private void selectMultiSyncAction() {
-        if (multiSelectSyncs.isEmpty()) {
-            Toast.makeText(this, R.string.toast_one_selection_required, Toast.LENGTH_LONG).show();
-        } else if (multiSelectSyncs.size() == 1) {
+        if (multiSelectSyncs.size() == 1) {
             selectAction(multiSelectSyncs.get(0));
         } else {
             String[] accountStrings = new String[multiSelectSyncs.size()];

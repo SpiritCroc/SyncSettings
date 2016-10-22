@@ -24,4 +24,9 @@
     <style name="TransparentTheme" parent="android:Theme">
         <item name="android:windowIsTranslucent">true</item>
     </style>
+
+    <style name="SelectActionButton">
+        <item name="android:paddingBottom">@dimen/button_padding</item>
+        <item name="android:paddingTop">@dimen/button_padding</item>
+    </style>
 </resources>

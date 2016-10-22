@@ -22,4 +22,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="text_size_title">24sp</dimen>
+    <dimen name="button_padding">16dp</dimen>
 </resources>

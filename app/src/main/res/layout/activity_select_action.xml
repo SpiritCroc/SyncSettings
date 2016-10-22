@@ -40,11 +40,13 @@
         <Button
             android:id="@+id/button_sync_now"
             android:text="@string/button_sync_now"
+            style="@style/SelectActionButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <Button
             android:id="@+id/button_force_sync_now"
             android:text="@string/button_force_sync_now"
+            style="@style/SelectActionButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -64,16 +66,19 @@
                 <Button
                     android:id="@+id/button_auto_sync_on"
                     android:text="@string/button_on"
+                    style="@style/SelectActionButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
                 <Button
                     android:id="@+id/button_auto_sync_off"
                     android:text="@string/button_off"
+                    style="@style/SelectActionButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
                 <Button
                     android:id="@+id/button_auto_sync_toggle"
                     android:text="@string/button_toggle"
+                    style="@style/SelectActionButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
             </LinearLayout>

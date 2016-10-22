@@ -38,9 +38,11 @@ public class ShortcutActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent intent = getIntent();
-        String action = intent.getStringExtra(Constants.EXTRA_ACTION);
 
-        if (action == null) {
+        boolean createShortcut = !intent.hasExtra(Constants.EXTRA_ACTION) &&
+                !intent.hasExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE);
+
+        if (createShortcut) {
             // Set theme before super.onCreate()
             // Default theme is TransparentTheme so the activity is invisible when launching
             // shortcuts
@@ -49,7 +51,7 @@ public class ShortcutActivity extends AppCompatActivity implements View.OnClickL
 
         super.onCreate(savedInstanceState);
 
-        if (action == null) {
+        if (createShortcut) {
             // Create shortcut
             setContentView(R.layout.activity_shortcut);
             startActivityForResult(

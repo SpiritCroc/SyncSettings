@@ -33,6 +33,10 @@ public abstract class Constants {
             "de.spiritcroc.syncsettings.extra.ACCOUNT_STRING";
     public static final String EXTRA_AUTHORITY =
             "de.spiritcroc.syncsettings.extra.AUTHORITY";
+    public static final String EXTRA_ACCOUNT_STRING_ARRAY =
+            "de.spiritcroc.syncsettings.extra.ACCOUNT_STRING_ARRAY";
+    public static final String EXTRA_AUTHORITY_ARRAY =
+            "de.spiritcroc.syncsettings.extra.AUTHORITY_ARRAY";
 
     public static final String ACTION_MASTER_SYNC_ON =
             "de.spiritcroc.syncsettings.action.MASTER_SYNC_ON";

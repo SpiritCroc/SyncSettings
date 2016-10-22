@@ -34,6 +34,8 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
 
     private Account account;
     private String authority;
+    private String[] accountStringArray;
+    private String[] authorityArray;
 
     private Button syncNowButton;
     private Button forceSyncNowButton;
@@ -41,27 +43,51 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
     private Button autoSyncOffButton;
     private Button autoSyncToggleButton;
 
+    private boolean multiSyncs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_action);
 
         Intent creationIntent = getIntent();
-        account= Util.getAccountFromIntent(this, creationIntent);
-        authority = creationIntent.getStringExtra(Constants.EXTRA_AUTHORITY);
+        accountStringArray =
+                creationIntent.getStringArrayExtra(Constants.EXTRA_ACCOUNT_STRING_ARRAY);
+        authorityArray = creationIntent.getStringArrayExtra(Constants.EXTRA_AUTHORITY_ARRAY);
+        if (accountStringArray == null) {
+            // Single account selected
+            multiSyncs = false;
 
-        if (account == null) {
-            Log.w(LOG_TAG, "account == null");
-            Toast.makeText(getApplicationContext(),
-                    R.string.toast_an_error_occurred, Toast.LENGTH_SHORT
-            ).show();
-            finish();
-        } else if (authority == null) {
-            Log.w(LOG_TAG, "authority == null");
-            Toast.makeText(getApplicationContext(),
-                    R.string.toast_an_error_occurred, Toast.LENGTH_SHORT
-            ).show();
-            finish();
+            account = Util.getAccountFromIntent(this, creationIntent);
+            authority = creationIntent.getStringExtra(Constants.EXTRA_AUTHORITY);
+
+            if (account == null) {
+                Log.w(LOG_TAG, "account == null");
+                Toast.makeText(getApplicationContext(),
+                        R.string.toast_an_error_occurred, Toast.LENGTH_SHORT
+                ).show();
+                finish();
+            } else if (authority == null) {
+                Log.w(LOG_TAG, "authority == null");
+                Toast.makeText(getApplicationContext(),
+                        R.string.toast_an_error_occurred, Toast.LENGTH_SHORT
+                ).show();
+                finish();
+            }
+        } else {
+            // Multiple accounts selected
+            multiSyncs = true;
+            String accountString = accountStringArray[0];
+            boolean same = true;
+            for (String s: accountStringArray) {
+                if (!s.equals(accountString)) {
+                    same = false;
+                    break;
+                }
+            }
+            if (same) {
+                account = Util.getAccount(this, accountString);
+            }
         }
 
         syncNowButton = (Button) findViewById(R.id.button_sync_now);
@@ -78,7 +104,8 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle(account.name);
+            actionBar.setTitle(account == null ? getString(R.string.activity_select_action) :
+                    account.name);
         }
     }
 
@@ -86,20 +113,36 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View view) {
         Intent result = new Intent();
         Bundle localeBundle = new Bundle();
-        localeBundle.putString(Constants.EXTRA_ACCOUNT_STRING, account.toString());
-        if (BuildConfig.DEBUG)
-            Log.v(LOG_TAG, "put extra for intent: EXTRA_ACCOUNT_STRING=" + account.toString());
-        localeBundle.putString(Constants.EXTRA_AUTHORITY, authority);
-        if (BuildConfig.DEBUG) Log.v(LOG_TAG, "put extra for intent: EXTRA_AUTHORITY=" + authority);
+        if (multiSyncs) {
+            localeBundle.putStringArray(Constants.EXTRA_ACCOUNT_STRING_ARRAY, accountStringArray);
+            localeBundle.putStringArray(Constants.EXTRA_AUTHORITY_ARRAY, authorityArray);
+            if (BuildConfig.DEBUG) {
+                for (int i = 0; i < accountStringArray.length; i++) {
+                    Log.v(LOG_TAG, "put extra for intent: EXTRA_ACCOUNT_STRING_ARRAY[" + i + "]=" +
+                            accountStringArray[i]);
+                    Log.v(LOG_TAG, "put extra for intent: EXTRA_AUTHORITY_ARRAY[" + i + "]=" +
+                            authorityArray[i]);
+                }
+            }
+        } else {
+            localeBundle.putString(Constants.EXTRA_ACCOUNT_STRING, account.toString());
+            localeBundle.putString(Constants.EXTRA_AUTHORITY, authority);
+            if (BuildConfig.DEBUG) {
+                Log.v(LOG_TAG, "put extra for intent: EXTRA_ACCOUNT_STRING=" + account.toString());
+                Log.v(LOG_TAG, "put extra for intent: EXTRA_AUTHORITY=" + authority);
+            }
+        }
 
         if (view.equals(syncNowButton)) {
             localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_SYNC_NOW);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
+                    account == null ?  getString(R.string.shortcut_sync_now_multi_select) :
                     getString(R.string.shortcut_sync_now, account.name, authority)
             );
         } else if (view.equals(forceSyncNowButton)) {
             localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_FORCE_SYNC_NOW);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
+                    account == null ? getString(R.string.shortcut_force_sync_now_multi_select) :
                     getString(R.string.shortcut_force_sync_now, account.name, authority)
             );
         } else if (view.equals(autoSyncOnButton)) {
@@ -108,6 +151,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
             );
             localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_ON);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
+                    account == null ? getString(R.string.shortcut_auto_sync_on_multi_select) :
                     getString(R.string.shortcut_auto_sync_on, account.name, authority)
             );
         } else if (view.equals(autoSyncOffButton)) {
@@ -116,6 +160,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
             );
             localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_OFF);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
+                    account == null ? getString(R.string.shortcut_auto_sync_off_multi_select) :
                     getString(R.string.shortcut_auto_sync_off, account.name, authority)
             );
         } else if (view.equals(autoSyncToggleButton)) {
@@ -125,6 +170,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
             );
             localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_TOGGLE);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
+                    account == null ? getString(R.string.shortcut_auto_sync_toggle_multi_select) :
                     getString(R.string.shortcut_auto_sync_toggle, account.name, authority)
             );
         } else {

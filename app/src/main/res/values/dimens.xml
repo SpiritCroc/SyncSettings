@@ -23,4 +23,6 @@
 
     <dimen name="text_size_title">24sp</dimen>
     <dimen name="button_padding">16dp</dimen>
+
+    <dimen name="checkbox_padding">4dp</dimen>
 </resources>

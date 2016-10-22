@@ -68,59 +68,85 @@ public abstract class Util {
                 return;
             }
 
-            account = getAccountFromBundle(context, localeBundle);
-            authority = localeBundle.getString(Constants.EXTRA_AUTHORITY);
+            if (localeBundle.containsKey(Constants.EXTRA_ACCOUNT_STRING_ARRAY)) {
+                String[] accountStringArray =
+                        localeBundle.getStringArray(Constants.EXTRA_ACCOUNT_STRING_ARRAY);
+                String[] authorityArray =
+                        localeBundle.getStringArray(Constants.EXTRA_AUTHORITY_ARRAY);
+                if (accountStringArray == null) {
+                    Log.e(LOG_TAG, "accountStringArray = null");
+                    return;
+                }
+                if (authorityArray == null) {
+                    Log.e(LOG_TAG, "accountStringArray = null");
+                    return;
+                }
+                if (accountStringArray.length != authorityArray.length) {
+                    Log.e(LOG_TAG, "accountStringArray.length != authorityArray.length");
+                    return;
+                }
+                for (int i = 0; i < accountStringArray.length; i++) {
+                    handleAction(context, action, getAccount(context, accountStringArray[i]),
+                            authorityArray[i]);
+                }
+                return;
+            } else {
+                account = getAccountFromBundle(context, localeBundle);
+                authority = localeBundle.getString(Constants.EXTRA_AUTHORITY);
+            }
         } else {
             Log.d(LOG_TAG, "Using deprecated way of getting instructions from intent");
 
             account = getAccountFromIntent(context, intent);
             authority = intent.getStringExtra(Constants.EXTRA_AUTHORITY);
         }
+
+        handleAction(context, action, account, authority);
+    }
+
+    private static void handleAction(Context context, String action,
+                                     Account account, String authority) {
         switch (action) {
             case Constants.ACTION_MASTER_SYNC_ON:
-                Util.autoMasterSyncOn();
+                autoMasterSyncOn();
                 break;
             case Constants.ACTION_MASTER_SYNC_OFF:
-                Util.autoMasterSyncOff();
+                autoMasterSyncOff();
                 break;
             case Constants.ACTION_MASTER_SYNC_TOGGLE:
-                Util.autoMasterSyncToggle();
+                autoMasterSyncToggle();
                 break;
             case Constants.ACTION_SYNC_NOW:
                 if (accountAndAuthorityValid(context, account, authority)) {
-                    Util.syncNow(account, authority);
+                    syncNow(account, authority);
                 }
                 break;
             case Constants.ACTION_FORCE_SYNC_NOW:
                 if (accountAndAuthorityValid(context, account, authority)) {
-                    Util.forceSyncNow(account, authority);
+                    forceSyncNow(account, authority);
                 }
                 break;
             case Constants.ACTION_AUTO_SYNC_ON:
                 if (accountAndAuthorityValid(context, account, authority)) {
-                    Util.autoSyncOn(account, authority);
+                    autoSyncOn(account, authority);
                 }
                 break;
             case Constants.ACTION_AUTO_SYNC_OFF:
                 if (accountAndAuthorityValid(context, account, authority)) {
-                    Util.autoSyncOff(account, authority);
+                    autoSyncOff(account, authority);
                 }
                 break;
             case Constants.ACTION_AUTO_SYNC_TOGGLE:
                 if (accountAndAuthorityValid(context, account, authority)) {
-                    Util.autoSyncToggle(account, authority);
+                    autoSyncToggle(account, authority);
                 }
                 break;
             default:
-                Log.w(LOG_TAG, "handleAction: Unknown action: " + intent.getAction());
+                Log.w(LOG_TAG, "handleAction: Unknown action: " + action);
                 break;
         }
     }
 
-    /**
-     * @deprecated Use getAccountFromBundle instead
-     */
-    @Deprecated
     public static Account getAccountFromIntent(Context context, Intent intent) {
         if (intent.hasExtra(Constants.EXTRA_ACCOUNT_STRING)) {
             String accountString = intent.getStringExtra(Constants.EXTRA_ACCOUNT_STRING);
@@ -145,7 +171,7 @@ public abstract class Util {
         }
     }
 
-    private static Account getAccount(Context context, String accountString){
+    public static Account getAccount(Context context, String accountString) {
         Account[] accounts = AccountManager.get(context.getApplicationContext()).getAccounts();
         for (Account account: accounts) {
             if (BuildConfig.DEBUG) Log.v(LOG_TAG, "Found account " + account.toString());

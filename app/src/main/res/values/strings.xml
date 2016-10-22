@@ -19,6 +19,10 @@
 <resources>
     <string name="app_name">Sync Settings</string>
     <string name="activity_select_sync">Select account/data</string>
+    <string name="activity_select_action">Select action</string>
+
+    <string name="action_select_multiple">Multiple selections</string>
+    <string name="action_next">Continue</string>
 
     <string name="enter_shortcut_name">Enter shortcut name:</string>
 
@@ -46,9 +50,15 @@
     <string name="shortcut_auto_sync_on">Enable sync %1$s (%2$s)</string>
     <string name="shortcut_auto_sync_off">Disable sync %1$s (%2$s)</string>
     <string name="shortcut_auto_sync_toggle">Toggle sync %1$s (%2$s)</string>
+    <string name="shortcut_sync_now_multi_select">Sync multiple accounts</string>
+    <string name="shortcut_force_sync_now_multi_select">Force sync multiple accounts</string>
+    <string name="shortcut_auto_sync_on_multi_select">Enable sync for multiple accounts</string>
+    <string name="shortcut_auto_sync_off_multi_select">Disable sync for multiple accounts</string>
+    <string name="shortcut_auto_sync_toggle_multi_select">Toggle sync for multiple accounts</string>
     <string name="shortcut_sync_master_on">Enable auto sync</string>
     <string name="shortcut_sync_master_off">Disable auto sync</string>
     <string name="shortcut_sync_master_toggle">Toggle auto sync</string>
 
     <string name="toast_an_error_occurred">Sync Settings: An error occurred</string>
+    <string name="toast_one_selection_required">At least one selection required!</string>
 </resources>

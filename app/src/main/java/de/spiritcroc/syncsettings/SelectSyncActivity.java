@@ -31,9 +31,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ExpandableListView;
-import android.widget.SimpleExpandableListAdapter;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +59,9 @@ public class SelectSyncActivity extends AppCompatActivity {
     private ArrayList<Account> groups;
     private ArrayList<Sync> syncs;
 
+    private boolean multiSelectMode = false;
+    private ArrayList<Sync> multiSelectSyncs = new ArrayList<>();
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,85 +82,49 @@ public class SelectSyncActivity extends AppCompatActivity {
                                         int childPosition, long id) {
                 if (DEBUG) Log.d(LOG_TAG, "Click " + groupPosition + "/" + childPosition);
 
-                if (groupPosition == 0) {
-                    // Master sync settings
-                    String action = syncs.get(childPosition).authority;
-                    Intent result = new Intent();
-                    Bundle localeBundle = new Bundle();
-                    if (getString(R.string.sync_master_on).equals(action)) {
-                        Util.maybeRequestPermissions(SelectSyncActivity.this,
-                                new String[]{Manifest.permission.WRITE_SYNC_SETTINGS}
-                        );
-                        localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_MASTER_SYNC_ON);
-                        result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
-                                getString(R.string.shortcut_sync_master_on)
-                        );
-                    } else if (getString(R.string.sync_master_off).equals(action)) {
-                        Util.maybeRequestPermissions(SelectSyncActivity.this,
-                                new String[]{Manifest.permission.WRITE_SYNC_SETTINGS}
-                        );
-                        localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_MASTER_SYNC_OFF);
-                        result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
-                                getString(R.string.shortcut_sync_master_off)
-                        );
-                    } else if (getString(R.string.sync_master_toggle).equals(action)) {
-                        Util.maybeRequestPermissions(SelectSyncActivity.this,
-                                new String[]{Manifest.permission.READ_SYNC_SETTINGS,
-                                        Manifest.permission.WRITE_SYNC_SETTINGS}
-                        );
-                        localeBundle.putString(Constants.EXTRA_ACTION,
-                                Constants.ACTION_MASTER_SYNC_TOGGLE);
-                        result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
-                                getString(R.string.shortcut_sync_master_toggle)
-                        );
-                    } else {
-                        Log.w(LOG_TAG, "Could not find master action " + action);
-                        return false;
-                    }
-                    result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE, localeBundle);
-                    finishWithResult(result);
-                    return true;
+                CheckBox cb;
+                if (multiSelectMode) {
+                    cb = (CheckBox) v.findViewById(android.R.id.checkbox);
+                    cb.toggle();
+                } else {
+                    cb = null;
                 }
 
-                int index = 0;
-
-                // Fix offset because of master sync settings
-                groupPosition--;
-
-                // Get the clicked sync
-                for (int i = 0; i < syncs.size(); i++) {
-                    if (syncs.get(i).account == null) {
-                        // Irrelevant, master sync settings already checked
-                        continue;
-                    }
-                    if (syncs.get(i).account.equals(groups.get(groupPosition))) {
-                        index++;
-                    }
-                    if (index == childPosition+1) {
-                        Sync clickedSync = syncs.get(i);
-
-                        if (DEBUG) Log.d(LOG_TAG, "Clicked " + clickedSync.account.name +
-                                "/" + clickedSync.authority);
-
-                        if (clickedSync.account == null) {
-                            // Master sync setting
-
-                        } else {
-                            Intent intent =
-                                    new Intent(SelectSyncActivity.this, SelectActionActivity.class);
-                            intent.putExtra(Constants.EXTRA_ACCOUNT_STRING,
-                                    clickedSync.account.toString());
-                            intent.putExtra(Constants.EXTRA_AUTHORITY, clickedSync.authority);
-                            startActivityForResult(intent, REQUEST_SELECT_ACTION);
-                            break;
-                        }
-                    }
-                }
-                return true;
+                return onSyncClick(groupPosition, childPosition, cb);
             }
         });
 
         loadSyncs(false);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.select_sync, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.next).setVisible(multiSelectMode);
+        menu.findItem(R.id.multi_select).setChecked(multiSelectMode);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.next:
+                selectMultiSyncAction();
+                return true;
+            case R.id.multi_select:
+                multiSelectMode = !item.isChecked();
+                item.setChecked(multiSelectMode);
+                loadSyncs(false);
+                invalidateOptionsMenu();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -196,11 +166,14 @@ public class SelectSyncActivity extends AppCompatActivity {
         }
 
         syncs.clear();
+        multiSelectSyncs.clear();
 
-        // Syncs with no account will be master sync setting
-        syncs.add(new Sync(null, getString(R.string.sync_master_on)));
-        syncs.add(new Sync(null, getString(R.string.sync_master_off)));
-        syncs.add(new Sync(null, getString(R.string.sync_master_toggle)));
+        if (!multiSelectMode) {
+            // Syncs with no account will be master sync setting
+            syncs.add(new Sync(null, getString(R.string.sync_master_on)));
+            syncs.add(new Sync(null, getString(R.string.sync_master_off)));
+            syncs.add(new Sync(null, getString(R.string.sync_master_toggle)));
+        }
 
         // Get user accounts
         AccountManager accountManager = AccountManager.get(getApplicationContext());
@@ -233,10 +206,12 @@ public class SelectSyncActivity extends AppCompatActivity {
         final String CHILD = "CHILD_NAME";
 
         List<Map<String, String>> groupData = new ArrayList<Map<String, String>>() {{
-            // Add master sync group:
-            add(new HashMap<String, String>() {{
-                put(ROOT, getString(R.string.sync_master));
-            }});
+            if (!multiSelectMode) {
+                // Add master sync group:
+                add(new HashMap<String, String>() {{
+                    put(ROOT, getString(R.string.sync_master));
+                }});
+            }
             // Add accounts:
             for (int i = 0; i < groups.size(); i++) {
                 final int j = i;
@@ -250,21 +225,23 @@ public class SelectSyncActivity extends AppCompatActivity {
 
 
 
-        // Add master sync items:
-        List<Map<String, String>> masterChildGroup = new ArrayList<Map<String, String>>(){{
-            for (int j = 0; j < syncs.size(); j++) {
-                final Sync sync = syncs.get(j);
-                if (sync.account == null) {
-                    add(new HashMap<String, String>() {{
-                        put(CHILD, sync.authority);
-                    }});
-                } else {
-                    break;
+        if (!multiSelectMode) {
+            // Add master sync items:
+            List<Map<String, String>> masterChildGroup = new ArrayList<Map<String, String>>() {{
+                for (int j = 0; j < syncs.size(); j++) {
+                    final Sync sync = syncs.get(j);
+                    if (sync.account == null) {
+                        add(new HashMap<String, String>() {{
+                            put(CHILD, sync.authority);
+                        }});
+                    } else {
+                        break;
+                    }
                 }
-            }
-        }};
-        // Add account data:
-        listOfChildGroups.add(masterChildGroup);
+            }};
+            // Add account data:
+            listOfChildGroups.add(masterChildGroup);
+        }
         for (int i = 0; i < groups.size(); i++) {
             final int x = i;
             List<Map<String, String>> childGroup = new ArrayList<Map<String, String>>(){{
@@ -280,8 +257,20 @@ public class SelectSyncActivity extends AppCompatActivity {
             listOfChildGroups.add(childGroup);
         }
 
-        listView.setAdapter(new SimpleExpandableListAdapter(
+        int itemLayoutId = multiSelectMode ? R.layout.checkable_expandable_list_item :
+                android.R.layout.simple_expandable_list_item_1;
+        SimpleCheckableExpandableListAdapter adapter = new SimpleCheckableExpandableListAdapter(
                 this,
+                new SimpleCheckableExpandableListAdapter.OnChildCheckboxClickListener() {
+                    @Override
+                    public void onCheckboxClick(CheckBox cb, int groupPosition, int childPosition) {
+                        onSyncClick(groupPosition, childPosition, cb);
+                    }
+                    @Override
+                    public boolean shouldBeChecked(int groupPosition, int childPosition) {
+                        return multiSelectSyncs.contains(getSyncForPosition(groupPosition, childPosition));
+                    }
+                },
 
                 groupData,
                 android.R.layout.simple_expandable_list_item_1,
@@ -289,10 +278,130 @@ public class SelectSyncActivity extends AppCompatActivity {
                 new int[] {android.R.id.text1},
 
                 listOfChildGroups,
-                android.R.layout.simple_expandable_list_item_1,
+                itemLayoutId,
                 new String[] {CHILD},
                 new int[] {android.R.id.text1}
-        ));
+        );
+        listView.setAdapter(adapter);
+    }
+
+    private boolean onSyncClick(int groupPosition, int childPosition, CheckBox cb) {
+        if (!multiSelectMode) {
+            if (groupPosition == 0) {
+                // Master sync settings
+                String action = syncs.get(childPosition).authority;
+                Intent result = new Intent();
+                Bundle localeBundle = new Bundle();
+                if (getString(R.string.sync_master_on).equals(action)) {
+                    Util.maybeRequestPermissions(SelectSyncActivity.this,
+                            new String[]{Manifest.permission.WRITE_SYNC_SETTINGS}
+                    );
+                    localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_MASTER_SYNC_ON);
+                    result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
+                            getString(R.string.shortcut_sync_master_on)
+                    );
+                } else if (getString(R.string.sync_master_off).equals(action)) {
+                    Util.maybeRequestPermissions(SelectSyncActivity.this,
+                            new String[]{Manifest.permission.WRITE_SYNC_SETTINGS}
+                    );
+                    localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_MASTER_SYNC_OFF);
+                    result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
+                            getString(R.string.shortcut_sync_master_off)
+                    );
+                } else if (getString(R.string.sync_master_toggle).equals(action)) {
+                    Util.maybeRequestPermissions(SelectSyncActivity.this,
+                            new String[]{Manifest.permission.READ_SYNC_SETTINGS,
+                                    Manifest.permission.WRITE_SYNC_SETTINGS}
+                    );
+                    localeBundle.putString(Constants.EXTRA_ACTION,
+                            Constants.ACTION_MASTER_SYNC_TOGGLE);
+                    result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
+                            getString(R.string.shortcut_sync_master_toggle)
+                    );
+                } else {
+                    Log.w(LOG_TAG, "Could not find master action " + action);
+                    return false;
+                }
+                result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE, localeBundle);
+                finishWithResult(result);
+                return true;
+            }
+
+            // Fix offset because of master sync settings
+            groupPosition--;
+        }
+
+        Sync clickedSync = getSyncForPosition(groupPosition, childPosition);
+
+        if (clickedSync != null) {
+            if (DEBUG) Log.d(LOG_TAG, "Clicked " + clickedSync.account.name +
+                    "/" + clickedSync.authority);
+
+            if (clickedSync.account == null) {
+                // Master sync setting
+            } else if (multiSelectMode) {
+                if (cb.isChecked()) {
+                    multiSelectSyncs.add(clickedSync);
+                } else {
+                    multiSelectSyncs.remove(clickedSync);
+                }
+                if (DEBUG) {
+                    Log.v(LOG_TAG, "Selected syncs:");
+                    for (int j = 0; j < multiSelectSyncs.size(); j++) {
+                        Log.v(LOG_TAG, "\t\t" + multiSelectSyncs.get(j));
+                    }
+                }
+            } else {
+                selectAction(clickedSync);
+            }
+        }
+        return true;
+    }
+
+    private void selectAction(Sync sync) {
+        Intent intent =
+                new Intent(SelectSyncActivity.this, SelectActionActivity.class);
+        intent.putExtra(Constants.EXTRA_ACCOUNT_STRING,
+                sync.account.toString());
+        intent.putExtra(Constants.EXTRA_AUTHORITY, sync.authority);
+        startActivityForResult(intent, REQUEST_SELECT_ACTION);
+    }
+
+    private void selectMultiSyncAction() {
+        if (multiSelectSyncs.isEmpty()) {
+            Toast.makeText(this, R.string.toast_one_selection_required, Toast.LENGTH_LONG).show();
+        } else if (multiSelectSyncs.size() == 1) {
+            selectAction(multiSelectSyncs.get(0));
+        } else {
+            String[] accountStrings = new String[multiSelectSyncs.size()];
+            String[] authorityStrings = new String[multiSelectSyncs.size()];
+            for (int i = 0; i < multiSelectSyncs.size(); i++) {
+                accountStrings[i] = multiSelectSyncs.get(i).account.toString();
+                authorityStrings[i] = multiSelectSyncs.get(i).authority;
+            }
+            Intent intent =
+                    new Intent(SelectSyncActivity.this, SelectActionActivity.class);
+            intent.putExtra(Constants.EXTRA_ACCOUNT_STRING_ARRAY, accountStrings);
+            intent.putExtra(Constants.EXTRA_AUTHORITY_ARRAY, authorityStrings);
+            startActivityForResult(intent, REQUEST_SELECT_ACTION);
+        }
+    }
+
+    private Sync getSyncForPosition(int groupPosition, int childPosition) {
+        int index = 0;
+        for (int i = 0; i < syncs.size(); i++) {
+            if (syncs.get(i).account == null) {
+                // Irrelevant, master sync settings already checked
+                continue;
+            }
+            if (syncs.get(i).account.equals(groups.get(groupPosition))) {
+                index++;
+            }
+            if (index == childPosition + 1) {
+                return syncs.get(i);
+            }
+        }
+        return null;
     }
 
     private class Sync {
@@ -301,6 +410,10 @@ public class SelectSyncActivity extends AppCompatActivity {
         public Sync(Account account, String authority) {
             this.account = account;
             this.authority = authority;
+        }
+        @Override
+        public String toString() {
+            return "Sync {account = " + account + " authority = " + authority + " }";
         }
     }
 }

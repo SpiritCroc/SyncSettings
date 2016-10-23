@@ -24,8 +24,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +37,8 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
     private static final boolean DEBUG = false;
 
     private OnChildCheckboxClickListener onChildCheckboxClickListener;
+
+    private volatile ArrayList<Integer> expandedGroups = new ArrayList<>();
 
     public SimpleCheckableExpandableListAdapter(Context context, OnChildCheckboxClickListener checkboxListener,
                                                 List<? extends Map<String, ?>> groupData,int groupLayout,
@@ -91,6 +95,35 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
         return v;
     }
 
+    @Override
+    public void onGroupExpanded(int groupPosition) {
+        super.onGroupExpanded(groupPosition);
+        if (DEBUG) Log.v(LOG_TAG, "Expanded " + groupPosition);
+        expandedGroups.add(groupPosition);
+    }
+
+    @Override
+    public void onGroupCollapsed(int groupPosition) {
+        super.onGroupCollapsed(groupPosition);
+        if (DEBUG) Log.v(LOG_TAG, "Collapsed " + groupPosition);
+        expandedGroups.remove((Integer) groupPosition);
+    }
+
+    public void restoreExpandedGroups(ExpandableListView ls, ArrayList<Integer> expandedGroups,
+                                      int offset) {
+        if (DEBUG) Log.v(LOG_TAG, "Restore expanded groups: " + expandedGroups.size());
+        for (int i = 0; i < expandedGroups.size(); i++) {
+            int group = expandedGroups.get(i) + offset;
+            if (group >= 0) {
+                if (DEBUG) Log.v(LOG_TAG, "\t\texpand " + group);
+                ls.expandGroup(group);
+            }
+        }
+    }
+
+    public ArrayList<Integer> getExpandedGroups() {
+        return expandedGroups;
+    }
 
     private View.OnClickListener checkboxOnClickListener = new View.OnClickListener() {
         @Override

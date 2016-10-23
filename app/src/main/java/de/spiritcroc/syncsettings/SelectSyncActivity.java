@@ -55,6 +55,7 @@ public class SelectSyncActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSION_GET_ACCOUNTS = 2;
 
     private ExpandableListView listView;
+    private SimpleCheckableExpandableListAdapter listAdapter;
     private ArrayList<Account> groups;
     private ArrayList<Sync> syncs;
 
@@ -93,7 +94,7 @@ public class SelectSyncActivity extends AppCompatActivity {
             }
         });
 
-        loadSyncs(false);
+        loadSyncs(false, null);
     }
 
     @Override
@@ -118,7 +119,8 @@ public class SelectSyncActivity extends AppCompatActivity {
             case R.id.multi_select:
                 multiSelectMode = !multiSelectMode;
                 item.setChecked(multiSelectMode);
-                loadSyncs(false);
+                int groupOffset = multiSelectMode ? -1 : 1;
+                loadSyncs(false, groupOffset);
                 invalidateOptionsMenu();
                 return true;
             default:
@@ -144,7 +146,7 @@ public class SelectSyncActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                           @NonNull int[] grantResults) {
         if (requestCode == REQUEST_PERMISSION_GET_ACCOUNTS) {
-            loadSyncs(true);
+            loadSyncs(true, null);
         }
     }
 
@@ -153,7 +155,11 @@ public class SelectSyncActivity extends AppCompatActivity {
         finish();
     }
 
-    private void loadSyncs(boolean skipPermissionCheck) {
+    /**
+     * @param groupOffsetToPrevious
+     * Null if no previous state or new state not describable using offset to previous
+     */
+    private void loadSyncs(boolean skipPermissionCheck, Integer groupOffsetToPrevious) {
         // Permission to read accounts required
         if (!skipPermissionCheck &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) !=
@@ -162,6 +168,13 @@ public class SelectSyncActivity extends AppCompatActivity {
                     REQUEST_PERMISSION_GET_ACCOUNTS
             );
             return;
+        }
+
+        ArrayList<Integer> expandedGroups;
+        if (listAdapter == null || groupOffsetToPrevious == null) {
+            expandedGroups = null;
+        } else {
+            expandedGroups = listAdapter.getExpandedGroups();
         }
 
         syncs.clear();
@@ -258,7 +271,7 @@ public class SelectSyncActivity extends AppCompatActivity {
 
         int itemLayoutId = multiSelectMode ? R.layout.checkable_expandable_list_item :
                 android.R.layout.simple_expandable_list_item_1;
-        SimpleCheckableExpandableListAdapter adapter = new SimpleCheckableExpandableListAdapter(
+        listAdapter = new SimpleCheckableExpandableListAdapter(
                 this,
                 new SimpleCheckableExpandableListAdapter.OnChildCheckboxClickListener() {
                     @Override
@@ -281,7 +294,10 @@ public class SelectSyncActivity extends AppCompatActivity {
                 new String[] {CHILD},
                 new int[] {android.R.id.text1}
         );
-        listView.setAdapter(adapter);
+        listView.setAdapter(listAdapter);
+        if (expandedGroups != null) {
+            listAdapter.restoreExpandedGroups(listView, expandedGroups, groupOffsetToPrevious);
+        }
     }
 
     private boolean onSyncClick(int groupPosition, int childPosition, CheckBox cb) {

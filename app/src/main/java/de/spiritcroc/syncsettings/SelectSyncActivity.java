@@ -95,6 +95,8 @@ public class SelectSyncActivity extends AppCompatActivity {
             }
         });
 
+        boolean expandFirst = false;
+
         Intent intent = getIntent();
         if (intent.hasExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE)) {
             // Create pre-selection from previous settings
@@ -119,6 +121,9 @@ public class SelectSyncActivity extends AppCompatActivity {
                     } else {
                         Log.w(LOG_TAG, "Invalid sync array extras");
                     }
+                } else {
+                    // Probably master action used
+                    expandFirst = true;
                 }
             }
             if (!initSelectedSyncs.isEmpty()) {
@@ -127,6 +132,10 @@ public class SelectSyncActivity extends AppCompatActivity {
         }
 
         loadSyncs(false, null);
+
+        if (expandFirst) {
+            listView.expandGroup(0);
+        }
     }
 
     private void addInitSync(String accountString, String authority) {

@@ -102,6 +102,31 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
         autoSyncOffButton.setOnClickListener(this);
         autoSyncToggleButton.setOnClickListener(this);
 
+        int defaultTextColor = getResources().getColor(R.color.default_text_color);
+        int initSelectTextColor = getResources().getColor(R.color.init_select_text_color);
+        String action = getIntent().getStringExtra(Constants.EXTRA_PREVIOUS_ACTION);
+
+        syncNowButton.setTextColor(
+                Constants.ACTION_SYNC_NOW.equals(action) ?
+                        initSelectTextColor : defaultTextColor
+        );
+        forceSyncNowButton.setTextColor(
+                Constants.ACTION_FORCE_SYNC_NOW.equals(action) ?
+                        initSelectTextColor : defaultTextColor
+        );
+        autoSyncOnButton.setTextColor(
+                Constants.ACTION_AUTO_SYNC_ON.equals(action) ?
+                        initSelectTextColor : defaultTextColor
+        );
+        autoSyncOffButton.setTextColor(
+                Constants.ACTION_AUTO_SYNC_OFF.equals(action) ?
+                        initSelectTextColor : defaultTextColor
+        );
+        autoSyncToggleButton.setTextColor(
+                Constants.ACTION_AUTO_SYNC_TOGGLE.equals(action) ?
+                        initSelectTextColor : defaultTextColor
+        );
+
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(account == null ? getString(R.string.activity_select_action) :

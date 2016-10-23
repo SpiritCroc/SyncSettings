@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +82,9 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
             cb.setTag(new Position(groupPosition, childPosition));
             ((CheckBox) cb).setChecked(updateListener.shouldBeChecked(groupPosition, childPosition));
         }
+        ((TextView) v.findViewById(android.R.id.text1)).setTextColor(
+                updateListener.getTextColorForPosition(groupPosition, childPosition)
+        );
         return v;
     }
 
@@ -92,6 +96,9 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
         if (cb instanceof CheckBox) {
             cb.setOnClickListener(checkboxOnClickListener);
         }
+        ((TextView) v.findViewById(android.R.id.text1)).setTextColor(
+                updateListener.getTextColorForGroup(groupPosition)
+        );
         return v;
     }
 
@@ -174,5 +181,7 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
         void onCheckboxClick(CheckBox cb, int groupPosition, int childPosition);
         boolean shouldBeChecked(int groupPosition, int childPosition);
         void onGroupExpandOrCollapse();
+        int getTextColorForPosition(int groupPosition, int childPosition);
+        int getTextColorForGroup(int groupPosition);
     }
 }

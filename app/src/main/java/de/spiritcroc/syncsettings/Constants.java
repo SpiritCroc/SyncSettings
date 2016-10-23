@@ -26,6 +26,8 @@ public abstract class Constants {
 
     public static final String EXTRA_ACTION =
             "de.spiritcroc.syncsettings.extra.ACTION";
+    public static final String EXTRA_PREVIOUS_ACTION =
+            "de.spiritcroc.syncsettings.extra.PREVIOUS_ACTION";
     @Deprecated // Use EXTRA_ACCOUNT_STRING instead
     public static final String EXTRA_ACCOUNT =
             "de.spiritcroc.syncsettings.extra.ACCOUNT";

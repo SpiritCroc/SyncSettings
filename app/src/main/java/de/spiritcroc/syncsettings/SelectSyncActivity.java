@@ -62,6 +62,7 @@ public class SelectSyncActivity extends AppCompatActivity {
     private boolean multiSelectMode = false;
     private ArrayList<Sync> multiSelectSyncs = new ArrayList<>();
     private ArrayList<Sync> initSelectedSyncs = new ArrayList<>();
+    private ArrayList<SyncListPos> initSelectedSyncPositions = new ArrayList<>();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -99,7 +100,7 @@ public class SelectSyncActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (intent.hasExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE)) {
-            // Create pre-selection from previous settings
+            // Create pre-selection from previous configuration
             Bundle localeBundle =
                     intent.getBundleExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE);
             if (localeBundle == null) {
@@ -255,12 +256,41 @@ public class SelectSyncActivity extends AppCompatActivity {
 
         syncs.clear();
         multiSelectSyncs = (ArrayList<Sync>) initSelectedSyncs.clone();
+        initSelectedSyncPositions.clear();
 
         if (!multiSelectMode) {
             // Syncs with no account will be master sync setting
             syncs.add(new Sync(null, getString(R.string.sync_master_on)));
             syncs.add(new Sync(null, getString(R.string.sync_master_off)));
             syncs.add(new Sync(null, getString(R.string.sync_master_toggle)));
+
+            // Create pre-selection from previous configuration
+            Intent intent = getIntent();
+            Bundle localeBundle =
+                    intent.getBundleExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE);
+            if (localeBundle != null) {
+                String action = localeBundle.getString(Constants.EXTRA_ACTION);
+                if (action != null) {
+                    int pos;
+                    switch (action) {
+                        case Constants.ACTION_MASTER_SYNC_ON:
+                            pos = 0;
+                            break;
+                        case Constants.ACTION_MASTER_SYNC_OFF:
+                            pos = 1;
+                            break;
+                        case Constants.ACTION_MASTER_SYNC_TOGGLE:
+                            pos = 2;
+                            break;
+                        default:
+                            pos = -1;
+                            break;
+                    }
+                    if (pos >= 0) {
+                        initSelectedSyncPositions.add(new SyncListPos(0, pos));
+                    }
+                }
+            }
         }
 
         // Get user accounts
@@ -332,20 +362,24 @@ public class SelectSyncActivity extends AppCompatActivity {
         }
         final ArrayList<Integer> initExpandedGroups = new ArrayList<>();
         for (int i = 0; i < groups.size(); i++) {
-            final int currentGroup = i;
+            final int currentGroup = i + (multiSelectMode ? 0 : 1);
 
             final int x = i;
             List<Map<String, String>> childGroup = new ArrayList<Map<String, String>>(){{
+                int childCount = 0;
                 for (int j = 0; j < syncs.size(); j++) {
                     final Sync sync = syncs.get(j);
                     if (sync.account != null && sync.account.equals(groups.get(x))) {
                         add(new HashMap<String, String>() {{
                             put(CHILD, sync.authority);
                         }});
-                        if (initSelectedSyncs.contains(sync) &&
-                                !initExpandedGroups.contains(currentGroup)) {
-                            initExpandedGroups.add(currentGroup);
+                        if (initSelectedSyncs.contains(sync)) {
+                            initSelectedSyncPositions.add(new SyncListPos(currentGroup, childCount));
+                            if (!initExpandedGroups.contains(currentGroup)) {
+                                initExpandedGroups.add(currentGroup);
+                            }
                         }
+                        childCount++;
                     }
                 }
             }};
@@ -368,6 +402,18 @@ public class SelectSyncActivity extends AppCompatActivity {
                     @Override
                     public void onGroupExpandOrCollapse() {
                         invalidateOptionsMenu();
+                    }
+                    @Override
+                    public int getTextColorForPosition(int groupPosition, int childPosition) {
+                        if (initSelectedSyncPositions.contains(
+                                new SyncListPos(groupPosition, childPosition))) {
+                            return getResources().getColor(R.color.init_select_text_color);
+                        }
+                        return getResources().getColor(R.color.default_text_color);
+                    }
+                    @Override
+                    public int getTextColorForGroup(int groupPosition) {
+                        return getResources().getColor(R.color.group_text_color);
                     }
                 },
 
@@ -479,7 +525,7 @@ public class SelectSyncActivity extends AppCompatActivity {
         intent.putExtra(Constants.EXTRA_ACCOUNT_STRING,
                 sync.account.toString());
         intent.putExtra(Constants.EXTRA_AUTHORITY, sync.authority);
-        startActivityForResult(intent, REQUEST_SELECT_ACTION);
+        selectAction(intent);
     }
 
     private void selectMultiSyncAction() {
@@ -496,8 +542,17 @@ public class SelectSyncActivity extends AppCompatActivity {
                     new Intent(SelectSyncActivity.this, SelectActionActivity.class);
             intent.putExtra(Constants.EXTRA_ACCOUNT_STRING_ARRAY, accountStrings);
             intent.putExtra(Constants.EXTRA_AUTHORITY_ARRAY, authorityStrings);
-            startActivityForResult(intent, REQUEST_SELECT_ACTION);
+            selectAction(intent);
         }
+    }
+
+    private void selectAction(Intent intent) {
+        Bundle localeBundle =
+                getIntent().getBundleExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE);
+        String action =
+                localeBundle == null ? null : localeBundle.getString(Constants.EXTRA_ACTION);
+        intent.putExtra(Constants.EXTRA_PREVIOUS_ACTION, action);
+        startActivityForResult(intent, REQUEST_SELECT_ACTION);
     }
 
     private void selectAll() {

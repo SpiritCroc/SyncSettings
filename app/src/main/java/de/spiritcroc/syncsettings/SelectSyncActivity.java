@@ -154,7 +154,7 @@ public class SelectSyncActivity extends AppCompatActivity {
         menu.findItem(R.id.select_all).setVisible(multiSelectMode &&
                 multiSelectSyncs.size() < syncs.size());
         menu.findItem(R.id.undo_selection).setVisible(multiSelectMode &&
-                multiSelectSyncs.size() != initSelectedSyncs.size());
+                !multiSelectSyncs.isEmpty());
 
         menu.findItem(R.id.expand_all).setVisible(!listAdapter.allGroupsExpanded());
         menu.findItem(R.id.collapse_all).setVisible(!listAdapter.allGroupsCollapsed());
@@ -499,7 +499,7 @@ public class SelectSyncActivity extends AppCompatActivity {
     }
 
     private void undoSelection() {
-        multiSelectSyncs = (ArrayList<Sync>) initSelectedSyncs.clone();
+        multiSelectSyncs.clear();
         listAdapter.notifyDataSetInvalidated();
         invalidateOptionsMenu();
     }

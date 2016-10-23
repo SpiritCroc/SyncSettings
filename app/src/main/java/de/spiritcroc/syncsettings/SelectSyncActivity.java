@@ -95,7 +95,49 @@ public class SelectSyncActivity extends AppCompatActivity {
             }
         });
 
+        Intent intent = getIntent();
+        if (intent.hasExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE)) {
+            // Create pre-selection from previous settings
+            Bundle localeBundle =
+                    intent.getBundleExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE);
+            if (localeBundle == null) {
+                Log.w(LOG_TAG, "Intent has locale bundle which is null");
+            } else {
+                if (intent.hasExtra(Constants.EXTRA_ACCOUNT_STRING)) {
+                    addInitSync(intent.getStringExtra(Constants.EXTRA_ACCOUNT_STRING),
+                            intent.getStringExtra(Constants.EXTRA_AUTHORITY));
+                } else if (intent.hasExtra(Constants.EXTRA_ACCOUNT_STRING_ARRAY)) {
+                    String[] accountStringArray =
+                            intent.getStringArrayExtra(Constants.EXTRA_ACCOUNT_STRING_ARRAY);
+                    String[] authorityArray =
+                            intent.getStringArrayExtra(Constants.EXTRA_AUTHORITY_ARRAY);
+                    if (accountStringArray != null && authorityArray != null &&
+                            accountStringArray.length == authorityArray.length) {
+                        for (int i = 0; i < accountStringArray.length; i++) {
+                            addInitSync(accountStringArray[i], authorityArray[i]);
+                        }
+                    } else {
+                        Log.w(LOG_TAG, "Invalid sync array extras");
+                    }
+                }
+            }
+            if (!initSelectedSyncs.isEmpty()) {
+                multiSelectMode = true;
+            }
+        }
+
         loadSyncs(false, null);
+    }
+
+    private void addInitSync(String accountString, String authority) {
+        if (accountString == null || authority == null) {
+            return;
+        }
+        Account account = Util.getAccount(this, accountString);
+        if (account == null) {
+            return;
+        }
+        initSelectedSyncs.add(new Sync(account, authority));
     }
 
     @Override
@@ -203,7 +245,7 @@ public class SelectSyncActivity extends AppCompatActivity {
         }
 
         syncs.clear();
-        multiSelectSyncs.clear();
+        multiSelectSyncs = (ArrayList<Sync>) initSelectedSyncs.clone();
 
         if (!multiSelectMode) {
             // Syncs with no account will be master sync setting
@@ -279,7 +321,10 @@ public class SelectSyncActivity extends AppCompatActivity {
             // Add account data:
             listOfChildGroups.add(masterChildGroup);
         }
+        final ArrayList<Integer> initExpandedGroups = new ArrayList<>();
         for (int i = 0; i < groups.size(); i++) {
+            final int currentGroup = i;
+
             final int x = i;
             List<Map<String, String>> childGroup = new ArrayList<Map<String, String>>(){{
                 for (int j = 0; j < syncs.size(); j++) {
@@ -288,6 +333,10 @@ public class SelectSyncActivity extends AppCompatActivity {
                         add(new HashMap<String, String>() {{
                             put(CHILD, sync.authority);
                         }});
+                        if (initSelectedSyncs.contains(sync) &&
+                                !initExpandedGroups.contains(currentGroup)) {
+                            initExpandedGroups.add(currentGroup);
+                        }
                     }
                 }
             }};
@@ -330,6 +379,9 @@ public class SelectSyncActivity extends AppCompatActivity {
             if (!(listPosition == 0 && listPositionOffset == 0 || newPosition < 0)) {
                 listView.setSelectionFromTop(newPosition, listPositionOffset);
             }
+        } else if (!initExpandedGroups.isEmpty()) {
+            listAdapter.restoreExpandedGroups(listView, initExpandedGroups, 0);
+            listView.setSelection(initExpandedGroups.get(0));
         }
     }
 
@@ -479,6 +531,21 @@ public class SelectSyncActivity extends AppCompatActivity {
         @Override
         public String toString() {
             return "Sync {account = " + account + " authority = " + authority + " }";
+        }
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Sync) {
+                Sync s = (Sync) o;
+                if ((this.account == null) != (s.account == null)) {
+                    return false;
+                }
+                if ((this.authority == null) != (s.authority == null)) {
+                    return false;
+                }
+                return (this.account == null || this.account.toString().equals(s.account.toString())) &&
+                        (this.authority == null || this.authority.equals(s.authority));
+            }
+            return false;
         }
     }
 }

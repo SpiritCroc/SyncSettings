@@ -52,16 +52,14 @@ public abstract class Util {
     }
 
     public static void handleAction(Context context, Intent intent) {
-        String action = intent.getStringExtra(Constants.EXTRA_ACTION);
+        String action;
         Account account;
         String authority;
-        if (action == null) {
-            Bundle localeBundle =
-                    intent.getBundleExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE);
-            if (localeBundle == null) {
-                Log.e(LOG_TAG, "handleAction: intent missing EXTRA_BUNDLE");
-                return;
-            }
+        Bundle localeBundle =
+                intent.getBundleExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE);
+        if (localeBundle != null) {
+            Log.v(LOG_TAG, "Using locale bundle to get instructions");
+
             action = localeBundle.getString(Constants.EXTRA_ACTION);
             if (action == null) {
                 Log.e(LOG_TAG, "handleAction: EXTRA_BUNDLE missing action");
@@ -73,32 +71,36 @@ public abstract class Util {
                         localeBundle.getStringArray(Constants.EXTRA_ACCOUNT_STRING_ARRAY);
                 String[] authorityArray =
                         localeBundle.getStringArray(Constants.EXTRA_AUTHORITY_ARRAY);
-                if (accountStringArray == null) {
-                    Log.e(LOG_TAG, "accountStringArray = null");
-                    return;
-                }
-                if (authorityArray == null) {
-                    Log.e(LOG_TAG, "accountStringArray = null");
-                    return;
-                }
-                if (accountStringArray.length != authorityArray.length) {
-                    Log.e(LOG_TAG, "accountStringArray.length != authorityArray.length");
-                    return;
-                }
-                for (int i = 0; i < accountStringArray.length; i++) {
-                    handleAction(context, action, getAccount(context, accountStringArray[i]),
-                            authorityArray[i]);
-                }
+
+                handleAction(context, action, accountStringArray, authorityArray);
+
                 return;
             } else {
                 account = getAccountFromBundle(context, localeBundle);
                 authority = localeBundle.getString(Constants.EXTRA_AUTHORITY);
             }
         } else {
-            Log.d(LOG_TAG, "Using deprecated way of getting instructions from intent");
+            Log.v(LOG_TAG, "Locale bundle not found, using direct intent extras for instructions");
 
-            account = getAccountFromIntent(context, intent);
-            authority = intent.getStringExtra(Constants.EXTRA_AUTHORITY);
+            action = intent.getStringExtra(Constants.EXTRA_ACTION);
+            if (action == null) {
+                Log.e(LOG_TAG, "handleAction: intent missing action");
+                return;
+            }
+
+            if (intent.hasExtra(Constants.EXTRA_ACCOUNT_STRING_ARRAY)) {
+                String[] accountStringArray =
+                        intent.getStringArrayExtra(Constants.EXTRA_ACCOUNT_STRING_ARRAY);
+                String[] authorityArray =
+                        intent.getStringArrayExtra(Constants.EXTRA_AUTHORITY_ARRAY);
+
+                handleAction(context, action, accountStringArray, authorityArray);
+
+                return;
+            } else {
+                account = getAccountFromIntent(context, intent);
+                authority = intent.getStringExtra(Constants.EXTRA_AUTHORITY);
+            }
         }
 
         handleAction(context, action, account, authority);
@@ -144,6 +146,26 @@ public abstract class Util {
             default:
                 Log.w(LOG_TAG, "handleAction: Unknown action: " + action);
                 break;
+        }
+    }
+
+    private static void handleAction(Context context, String action,
+                                     String[] accountStringArray, String[] authorityArray) {
+        if (accountStringArray == null) {
+            Log.e(LOG_TAG, "accountStringArray = null");
+            return;
+        }
+        if (authorityArray == null) {
+            Log.e(LOG_TAG, "accountStringArray = null");
+            return;
+        }
+        if (accountStringArray.length != authorityArray.length) {
+            Log.e(LOG_TAG, "accountStringArray.length != authorityArray.length");
+            return;
+        }
+        for (int i = 0; i < accountStringArray.length; i++) {
+            handleAction(context, action, getAccount(context, accountStringArray[i]),
+                    authorityArray[i]);
         }
     }
 

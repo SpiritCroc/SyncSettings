@@ -429,6 +429,10 @@ public class SelectSyncActivity extends AppCompatActivity {
         );
         listView.setAdapter(listAdapter);
         if (expandedGroups != null) {
+            if (!multiSelectMode && expandedGroups.size() == listAdapter.getGroupCount() - 1) {
+                // Expand all groups. Negative group number because of offset
+                expandedGroups.add(-1);
+            }
             listAdapter.restoreExpandedGroups(listView, expandedGroups, groupOffsetToPrevious);
             int newPosition = listPosition + groupOffsetToPrevious;
             if (!(listPosition == 0 && listPositionOffset == 0 || newPosition < 0)) {

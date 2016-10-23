@@ -21,18 +21,17 @@ package de.spiritcroc.syncsettings;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 
-public class ShortcutActivity extends AppCompatActivity implements View.OnClickListener {
+public class ShortcutActivity extends AppCompatActivity {
 
     private static final int REQUEST_SHORTCUT = 2;
 
     private Intent resultIntent;
 
-    private Button okButton;
     private EditText editShortcutText;
 
     @Override
@@ -59,28 +58,35 @@ public class ShortcutActivity extends AppCompatActivity implements View.OnClickL
                     REQUEST_SHORTCUT
             );
 
-            okButton = (Button) findViewById(R.id.button_ok);
-            Button cancelButton = (Button) findViewById(R.id.button_cancel);
             editShortcutText = (EditText) findViewById(R.id.edit_shortcut_name);
-
-            okButton.setOnClickListener(this);
-            cancelButton.setOnClickListener(this);
         } else {
             // Handle shortcut
             finish();
             Util.handleAction(this, intent);
         }
-
     }
 
     @Override
-    public void onClick(View view) {
-        if (view.equals(okButton) && resultIntent != null) {
-            String shortcutText = editShortcutText.getText().toString();
-            resultIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, shortcutText);
-            setResult(RESULT_OK, resultIntent);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.create_shortcut, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.next:
+                if (resultIntent != null) {
+                    String shortcutText = editShortcutText.getText().toString();
+                    resultIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, shortcutText);
+                    setResult(RESULT_OK, resultIntent);
+                }
+            case R.id.cancel:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        finish();
     }
 
     @Override

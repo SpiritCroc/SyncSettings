@@ -23,6 +23,7 @@
 
     <string name="action_select_multiple">Multiple selections</string>
     <string name="action_next">Continue</string>
+    <string name="action_cancel">Cancel</string>
     <string name="action_select_all">Select all</string>
     <string name="action_undo_selection">Undo selection</string>
     <string name="action_expand_all">Expand all</string>
@@ -46,8 +47,6 @@
     <string name="button_on">@string/on</string>
     <string name="button_off">@string/off</string>
     <string name="button_toggle">@string/toggle</string>
-    <string name="button_ok">OK</string>
-    <string name="button_cancel">Cancel</string>
 
     <string name="shortcut_sync_now">Sync %1$s (%2$s)</string>
     <string name="shortcut_force_sync_now">Force sync %1$s (%2$s)</string>

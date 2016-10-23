@@ -171,10 +171,14 @@ public class SelectSyncActivity extends AppCompatActivity {
         }
 
         ArrayList<Integer> expandedGroups;
+        int listPosition = 0, listPositionOffset = 0;
         if (listAdapter == null || groupOffsetToPrevious == null) {
             expandedGroups = null;
         } else {
             expandedGroups = listAdapter.getExpandedGroups();
+            listPosition = listView.getFirstVisiblePosition();
+            View v = listView.getChildAt(0);
+            listPositionOffset = (v == null ? 0 : v.getTop());
         }
 
         syncs.clear();
@@ -297,6 +301,10 @@ public class SelectSyncActivity extends AppCompatActivity {
         listView.setAdapter(listAdapter);
         if (expandedGroups != null) {
             listAdapter.restoreExpandedGroups(listView, expandedGroups, groupOffsetToPrevious);
+            int newPosition = listPosition + groupOffsetToPrevious;
+            if (!(listPosition == 0 && listPositionOffset == 0 || newPosition < 0)) {
+                listView.setSelectionFromTop(newPosition, listPositionOffset);
+            }
         }
     }
 

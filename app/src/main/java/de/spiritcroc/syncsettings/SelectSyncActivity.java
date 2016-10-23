@@ -108,10 +108,14 @@ public class SelectSyncActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.findItem(R.id.next).setVisible(multiSelectMode && !multiSelectSyncs.isEmpty());
         menu.findItem(R.id.multi_select).setChecked(multiSelectMode);
+
         menu.findItem(R.id.select_all).setVisible(multiSelectMode &&
                 multiSelectSyncs.size() < syncs.size());
         menu.findItem(R.id.undo_selection).setVisible(multiSelectMode &&
                 multiSelectSyncs.size() != initSelectedSyncs.size());
+
+        menu.findItem(R.id.expand_all).setVisible(!listAdapter.allGroupsExpanded());
+        menu.findItem(R.id.collapse_all).setVisible(!listAdapter.allGroupsCollapsed());
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -133,6 +137,12 @@ public class SelectSyncActivity extends AppCompatActivity {
                 return true;
             case R.id.undo_selection:
                 undoSelection();
+                return true;
+            case R.id.expand_all:
+                listAdapter.expandAll(listView);
+                return true;
+            case R.id.collapse_all:
+                listAdapter.collapseAll(listView);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -288,7 +298,7 @@ public class SelectSyncActivity extends AppCompatActivity {
                 android.R.layout.simple_expandable_list_item_1;
         listAdapter = new SimpleCheckableExpandableListAdapter(
                 this,
-                new SimpleCheckableExpandableListAdapter.OnChildCheckboxClickListener() {
+                new SimpleCheckableExpandableListAdapter.OnAdapterUpdateListener() {
                     @Override
                     public void onCheckboxClick(CheckBox cb, int groupPosition, int childPosition) {
                         onSyncClick(groupPosition, childPosition, cb);
@@ -296,6 +306,10 @@ public class SelectSyncActivity extends AppCompatActivity {
                     @Override
                     public boolean shouldBeChecked(int groupPosition, int childPosition) {
                         return multiSelectSyncs.contains(getSyncForPosition(groupPosition, childPosition));
+                    }
+                    @Override
+                    public void onGroupExpandOrCollapse() {
+                        invalidateOptionsMenu();
                     }
                 },
 

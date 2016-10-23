@@ -17,4 +17,10 @@
     <item
         android:id="@+id/select_all"
         android:title="@string/action_select_all" />
+    <item
+        android:id="@+id/expand_all"
+        android:title="@string/action_expand_all" />
+    <item
+        android:id="@+id/collapse_all"
+        android:title="@string/action_collapse_all" />
 </menu>

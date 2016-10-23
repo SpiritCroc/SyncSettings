@@ -25,6 +25,8 @@
     <string name="action_next">Continue</string>
     <string name="action_select_all">Select all</string>
     <string name="action_undo_selection">Undo selection</string>
+    <string name="action_expand_all">Expand all</string>
+    <string name="action_collapse_all">Collapse all</string>
 
     <string name="enter_shortcut_name">Enter shortcut name:</string>
 

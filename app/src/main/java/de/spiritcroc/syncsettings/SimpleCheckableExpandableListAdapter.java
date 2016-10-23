@@ -36,31 +36,31 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
             SimpleCheckableExpandableListAdapter.class.getSimpleName();
     private static final boolean DEBUG = false;
 
-    private OnChildCheckboxClickListener onChildCheckboxClickListener;
+    private OnAdapterUpdateListener updateListener;
 
     private volatile ArrayList<Integer> expandedGroups = new ArrayList<>();
 
-    public SimpleCheckableExpandableListAdapter(Context context, OnChildCheckboxClickListener checkboxListener,
+    public SimpleCheckableExpandableListAdapter(Context context, OnAdapterUpdateListener updateListener,
                                                 List<? extends Map<String, ?>> groupData,int groupLayout,
                                                 String[] groupFrom, int[] groupTo,
                                                 List<? extends List<? extends Map<String, ?>>> childData,
                                                 int childLayout, String[] childFrom, int[] childTo) {
         super(context, groupData, groupLayout, groupFrom, groupTo,
                 childData, childLayout, childFrom, childTo);
-        this.onChildCheckboxClickListener = checkboxListener;
+        this.updateListener = updateListener;
     }
 
-    public SimpleCheckableExpandableListAdapter(Context context, OnChildCheckboxClickListener checkboxListener,
+    public SimpleCheckableExpandableListAdapter(Context context, OnAdapterUpdateListener updateListener,
                                        List<? extends Map<String, ?>> groupData, int expandedGroupLayout,
                                        int collapsedGroupLayout, String[] groupFrom, int[] groupTo,
                                        List<? extends List<? extends Map<String, ?>>> childData,
                                        int childLayout, String[] childFrom, int[] childTo) {
         super(context, groupData, expandedGroupLayout, collapsedGroupLayout, groupFrom, groupTo,
                 childData, childLayout, childFrom, childTo);
-        this.onChildCheckboxClickListener = checkboxListener;
+        this.updateListener = updateListener;
     }
 
-    public SimpleCheckableExpandableListAdapter(Context context, OnChildCheckboxClickListener checkboxListener,
+    public SimpleCheckableExpandableListAdapter(Context context, OnAdapterUpdateListener updateListener,
                                        List<? extends Map<String, ?>> groupData, int expandedGroupLayout,
                                        int collapsedGroupLayout, String[] groupFrom, int[] groupTo,
                                        List<? extends List<? extends Map<String, ?>>> childData,
@@ -68,7 +68,7 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
                                        int[] childTo) {
         super(context, groupData, expandedGroupLayout, collapsedGroupLayout, groupFrom, groupTo,
                 childData, childLayout, lastChildLayout, childFrom, childTo);
-        this.onChildCheckboxClickListener = checkboxListener;
+        this.updateListener = updateListener;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
         if (cb instanceof CheckBox) {
             cb.setOnClickListener(checkboxOnClickListener);
             cb.setTag(new Position(groupPosition, childPosition));
-            ((CheckBox) cb).setChecked(onChildCheckboxClickListener.shouldBeChecked(groupPosition, childPosition));
+            ((CheckBox) cb).setChecked(updateListener.shouldBeChecked(groupPosition, childPosition));
         }
         return v;
     }
@@ -102,6 +102,7 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
         if (!expandedGroups.contains(groupPosition)) {
             expandedGroups.add(groupPosition);
         }
+        updateListener.onGroupExpandOrCollapse();
     }
 
     @Override
@@ -109,6 +110,7 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
         super.onGroupCollapsed(groupPosition);
         if (DEBUG) Log.v(LOG_TAG, "Collapsed " + groupPosition);
         expandedGroups.remove((Integer) groupPosition);
+        updateListener.onGroupExpandOrCollapse();
     }
 
     public void restoreExpandedGroups(ExpandableListView ls, ArrayList<Integer> expandedGroups,
@@ -123,9 +125,24 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
         }
     }
 
+    public boolean allGroupsCollapsed() {
+        return expandedGroups.isEmpty();
+    }
+
+    public boolean allGroupsExpanded() {
+        return expandedGroups.size() == getGroupCount();
+    }
+
     public void expandAll(ExpandableListView ls) {
         for (int i = 0; i < getGroupCount(); i++) {
             ls.expandGroup(i);
+        }
+        ls.setSelection(0);
+    }
+
+    public void collapseAll(ExpandableListView ls) {
+        for (int i = 0; i < getGroupCount(); i++) {
+            ls.collapseGroup(i);
         }
         ls.setSelection(0);
     }
@@ -140,7 +157,7 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
             CheckBox cb = (CheckBox) v;
             if (DEBUG) Log.d(LOG_TAG, "Checkbox toggled to " + cb.isChecked());
             Position p = (Position) cb.getTag();
-            onChildCheckboxClickListener.onCheckboxClick(cb, p.groupPosition, p.childPosition);
+            updateListener.onCheckboxClick(cb, p.groupPosition, p.childPosition);
         }
     };
 
@@ -153,8 +170,9 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
         }
     }
 
-    public interface OnChildCheckboxClickListener {
+    public interface OnAdapterUpdateListener {
         void onCheckboxClick(CheckBox cb, int groupPosition, int childPosition);
         boolean shouldBeChecked(int groupPosition, int childPosition);
+        void onGroupExpandOrCollapse();
     }
 }

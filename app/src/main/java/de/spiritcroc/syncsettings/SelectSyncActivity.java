@@ -389,12 +389,14 @@ public class SelectSyncActivity extends AppCompatActivity {
                 // Master sync setting
             } else if (multiSelectMode) {
                 boolean previousEmpty = multiSelectSyncs.isEmpty();
+                boolean previousFull = multiSelectSyncs.size() == syncs.size();
                 if (cb.isChecked()) {
                     multiSelectSyncs.add(clickedSync);
                 } else {
                     multiSelectSyncs.remove(clickedSync);
                 }
-                if (previousEmpty != multiSelectSyncs.isEmpty()) {
+                if (previousEmpty != multiSelectSyncs.isEmpty() ||
+                        previousFull != (multiSelectSyncs.size() == syncs.size())) {
                     invalidateOptionsMenu();
                 }
                 if (DEBUG) {

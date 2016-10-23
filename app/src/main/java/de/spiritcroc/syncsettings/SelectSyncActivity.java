@@ -64,6 +64,8 @@ public class SelectSyncActivity extends AppCompatActivity {
     private ArrayList<Sync> initSelectedSyncs = new ArrayList<>();
     private ArrayList<SyncListPos> initSelectedSyncPositions = new ArrayList<>();
 
+    private boolean masterSyncGroupWasExpanded = false;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -252,6 +254,9 @@ public class SelectSyncActivity extends AppCompatActivity {
             listPosition = listView.getFirstVisiblePosition();
             View v = listView.getChildAt(0);
             listPositionOffset = (v == null ? 0 : v.getTop());
+            if (groupOffsetToPrevious == -1) {
+                masterSyncGroupWasExpanded = expandedGroups.contains(0);
+            }
         }
 
         syncs.clear();
@@ -429,12 +434,20 @@ public class SelectSyncActivity extends AppCompatActivity {
         );
         listView.setAdapter(listAdapter);
         if (expandedGroups != null) {
-            if (!multiSelectMode && expandedGroups.size() == listAdapter.getGroupCount() - 1) {
+            if (!multiSelectMode && (masterSyncGroupWasExpanded ||
+                    expandedGroups.size() == listAdapter.getGroupCount() - 1)) {
                 // Expand all groups. Negative group number because of offset
                 expandedGroups.add(-1);
             }
             listAdapter.restoreExpandedGroups(listView, expandedGroups, groupOffsetToPrevious);
             int newPosition = listPosition + groupOffsetToPrevious;
+            if (groupOffsetToPrevious == 1 && expandedGroups.contains(0)) {
+                // Count of master sync settings
+                newPosition += 3;
+            } else if (masterSyncGroupWasExpanded) {
+                // Count of master sync settings
+                newPosition -= 3;
+            }
             if (!(listPosition == 0 && listPositionOffset == 0 || newPosition < 0)) {
                 listView.setSelectionFromTop(newPosition, listPositionOffset);
             }

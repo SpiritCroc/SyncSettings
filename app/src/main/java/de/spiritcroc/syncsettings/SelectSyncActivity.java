@@ -116,7 +116,7 @@ public class SelectSyncActivity extends AppCompatActivity {
                 selectMultiSyncAction();
                 return true;
             case R.id.multi_select:
-                multiSelectMode = !item.isChecked();
+                multiSelectMode = !multiSelectMode;
                 item.setChecked(multiSelectMode);
                 loadSyncs(false);
                 invalidateOptionsMenu();

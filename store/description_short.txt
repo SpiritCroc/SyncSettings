@@ -1,1 +1,1 @@
-Create Locale/LLama actions or launcher shortcuts to apply sync settings.
+Create Locale/LLama/Tasker actions or launcher shortcuts to apply sync settings.

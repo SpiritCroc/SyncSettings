@@ -1,8 +1,7 @@
-Create Locale/LLama actions or launcher shortcuts to apply specific sync settings.
+Create Locale/LLama/Tasker actions or launcher shortcuts to apply specific sync settings.
 
 This is not a standalone app!
-In order to use this app, you need an application like Locale/Llama or a launcher that can create shortcuts (e.g. Nova Launcher).
-(Locale not tested yet because I don't own it, any feedback by a Locale user would be appreciated)
+In order to use this app, you need an application like Locale/Llama/Tasker or a launcher that can create shortcuts (e.g. Nova Launcher).
 
 Available actions:
 - Master sync on/off/toggle

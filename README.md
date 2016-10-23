@@ -1,6 +1,6 @@
 # Sync Settings Shortcuts/Locale-Plugin
 
-Create Locale/LLama actions or launcher shortcuts to apply specific sync settings.
+Create Locale/LLama/Tasker actions or launcher shortcuts to apply specific sync settings.
 
 Available actions:
 - Master sync on/off/toggle

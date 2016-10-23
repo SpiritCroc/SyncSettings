@@ -99,7 +99,9 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
     public void onGroupExpanded(int groupPosition) {
         super.onGroupExpanded(groupPosition);
         if (DEBUG) Log.v(LOG_TAG, "Expanded " + groupPosition);
-        expandedGroups.add(groupPosition);
+        if (!expandedGroups.contains(groupPosition)) {
+            expandedGroups.add(groupPosition);
+        }
     }
 
     @Override
@@ -119,6 +121,13 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
                 ls.expandGroup(group);
             }
         }
+    }
+
+    public void expandAll(ExpandableListView ls) {
+        for (int i = 0; i < getGroupCount(); i++) {
+            ls.expandGroup(i);
+        }
+        ls.setSelection(0);
     }
 
     public ArrayList<Integer> getExpandedGroups() {

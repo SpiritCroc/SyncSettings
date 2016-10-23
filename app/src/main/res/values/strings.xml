@@ -23,6 +23,8 @@
 
     <string name="action_select_multiple">Multiple selections</string>
     <string name="action_next">Continue</string>
+    <string name="action_select_all">Select all</string>
+    <string name="action_undo_selection">Undo selection</string>
 
     <string name="enter_shortcut_name">Enter shortcut name:</string>
 

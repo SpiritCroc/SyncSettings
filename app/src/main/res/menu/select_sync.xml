@@ -11,4 +11,10 @@
         android:checkable="true"
         android:checked="false"
         android:title="@string/action_select_multiple" />
+    <item
+        android:id="@+id/undo_selection"
+        android:title="@string/action_undo_selection" />
+    <item
+        android:id="@+id/select_all"
+        android:title="@string/action_select_all" />
 </menu>

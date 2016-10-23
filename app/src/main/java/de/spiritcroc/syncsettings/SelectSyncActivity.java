@@ -61,6 +61,7 @@ public class SelectSyncActivity extends AppCompatActivity {
 
     private boolean multiSelectMode = false;
     private ArrayList<Sync> multiSelectSyncs = new ArrayList<>();
+    private ArrayList<Sync> initSelectedSyncs = new ArrayList<>();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -107,6 +108,10 @@ public class SelectSyncActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.findItem(R.id.next).setVisible(multiSelectMode && !multiSelectSyncs.isEmpty());
         menu.findItem(R.id.multi_select).setChecked(multiSelectMode);
+        menu.findItem(R.id.select_all).setVisible(multiSelectMode &&
+                multiSelectSyncs.size() < syncs.size());
+        menu.findItem(R.id.undo_selection).setVisible(multiSelectMode &&
+                multiSelectSyncs.size() != initSelectedSyncs.size());
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -122,6 +127,12 @@ public class SelectSyncActivity extends AppCompatActivity {
                 int groupOffset = multiSelectMode ? -1 : 1;
                 loadSyncs(false, groupOffset);
                 invalidateOptionsMenu();
+                return true;
+            case R.id.select_all:
+                selectAll();
+                return true;
+            case R.id.undo_selection:
+                undoSelection();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -410,6 +421,19 @@ public class SelectSyncActivity extends AppCompatActivity {
             intent.putExtra(Constants.EXTRA_AUTHORITY_ARRAY, authorityStrings);
             startActivityForResult(intent, REQUEST_SELECT_ACTION);
         }
+    }
+
+    private void selectAll() {
+        multiSelectSyncs = (ArrayList<Sync>) syncs.clone();
+        listAdapter.notifyDataSetInvalidated();
+        invalidateOptionsMenu();
+        listAdapter.expandAll(listView);
+    }
+
+    private void undoSelection() {
+        multiSelectSyncs = (ArrayList<Sync>) initSelectedSyncs.clone();
+        listAdapter.notifyDataSetInvalidated();
+        invalidateOptionsMenu();
     }
 
     private Sync getSyncForPosition(int groupPosition, int childPosition) {

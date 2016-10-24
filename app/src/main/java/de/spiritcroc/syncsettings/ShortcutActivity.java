@@ -35,11 +35,13 @@ public class ShortcutActivity extends AppCompatActivity {
 
     private EditText editShortcutText;
 
+    private boolean createShortcut = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent intent = getIntent();
 
-        boolean createShortcut = !intent.hasExtra(Constants.EXTRA_ACTION) &&
+        createShortcut = !intent.hasExtra(Constants.EXTRA_ACTION) &&
                 !intent.hasExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE);
 
         if (createShortcut) {
@@ -72,7 +74,9 @@ public class ShortcutActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.create_shortcut, menu);
+        if (createShortcut) {
+            getMenuInflater().inflate(R.menu.create_shortcut, menu);
+        }
         return true;
     }
 
@@ -97,15 +101,17 @@ public class ShortcutActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        // Edit the shortcut name
-        editShortcutText.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                InputMethodManager imm =
-                        (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                imm.showSoftInput(editShortcutText, InputMethodManager.SHOW_IMPLICIT);
-            }
-        }, 500);
+        if (createShortcut) {
+            // Edit the shortcut name
+            editShortcutText.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    InputMethodManager imm =
+                            (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(editShortcutText, InputMethodManager.SHOW_IMPLICIT);
+                }
+            }, 500);
+        }
     }
 
     @Override

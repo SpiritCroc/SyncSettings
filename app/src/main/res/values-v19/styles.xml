@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2015 SpiritCroc
+    Copyright (C) 2016 SpiritCroc
     Email: spiritcroc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -18,16 +18,10 @@
 -->
 
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat">
-        <!-- No customizations yet-->
-    </style>
     <style name="TransparentTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
-    </style>
-
-    <style name="SelectActionButton">
-        <item name="android:paddingBottom">@dimen/button_padding</item>
-        <item name="android:paddingTop">@dimen/button_padding</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 </resources>

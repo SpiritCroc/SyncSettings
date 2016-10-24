@@ -20,6 +20,7 @@ package de.spiritcroc.syncsettings;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,7 +62,10 @@ public class ShortcutActivity extends AppCompatActivity {
             editShortcutText = (EditText) findViewById(R.id.edit_shortcut_name);
         } else {
             // Handle shortcut
-            finish();
+            if (!Constants.ACTION_REQUEST_PERMISSIONS.equals(
+                    intent.getStringExtra(Constants.EXTRA_ACTION))) {
+                finish();
+            }
             Util.handleAction(this, intent);
         }
     }
@@ -122,4 +126,11 @@ public class ShortcutActivity extends AppCompatActivity {
             finish();
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        finish();
+    }
+
 }

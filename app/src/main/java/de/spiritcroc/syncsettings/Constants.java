@@ -57,4 +57,9 @@ public abstract class Constants {
     public static final String ACTION_AUTO_SYNC_TOGGLE =
             "de.spiritcroc.syncsettings.action.AUTO_SYNC_TOGGLE";
 
+    public static final String ACTION_REQUEST_PERMISSIONS =
+            "de.spiritcroc.syncsettings.action.REQUEST_PERMISSIONS";
+    public static final String EXTRA_REQUIRED_PERMISSIONS =
+            "de.spiritcroc.syncsettings.extra.REQUIRED_PERMISSIONS";
+
 }

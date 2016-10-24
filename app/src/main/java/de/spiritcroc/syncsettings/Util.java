@@ -18,6 +18,7 @@
 
 package de.spiritcroc.syncsettings;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -101,6 +102,16 @@ public abstract class Util {
                 account = getAccountFromIntent(context, intent);
                 authority = intent.getStringExtra(Constants.EXTRA_AUTHORITY);
             }
+        }
+
+        if (Constants.ACTION_REQUEST_PERMISSIONS.equals(action)) {
+            if (!(context instanceof Activity)) {
+                Log.w(LOG_TAG, "handleAction request permission: context is no activity");
+                return;
+            }
+            String[] permissions = intent.getStringArrayExtra(Constants.EXTRA_REQUIRED_PERMISSIONS);
+            maybeRequestPermissions((Activity) context, permissions);
+            return;
         }
 
         handleAction(context, action, account, authority);
@@ -194,6 +205,15 @@ public abstract class Util {
     }
 
     public static Account getAccount(Context context, String accountString) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.GET_ACCOUNTS) ==
+                PackageManager.PERMISSION_DENIED) {
+            context.startActivity(new Intent(context, ShortcutActivity.class)
+                    .putExtra(Constants.EXTRA_ACTION, Constants.ACTION_REQUEST_PERMISSIONS)
+                    .putExtra(Constants.EXTRA_REQUIRED_PERMISSIONS,
+                            new String[]{Manifest.permission.GET_ACCOUNTS})
+            );
+            return null;
+        }
         Account[] accounts = AccountManager.get(context.getApplicationContext()).getAccounts();
         for (Account account: accounts) {
             if (BuildConfig.DEBUG) Log.v(LOG_TAG, "Found account " + account.toString());

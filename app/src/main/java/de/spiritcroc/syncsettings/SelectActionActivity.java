@@ -64,7 +64,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
             if (account == null) {
                 Log.w(LOG_TAG, "account == null");
                 Toast.makeText(getApplicationContext(),
-                        R.string.toast_an_error_occurred, Toast.LENGTH_SHORT
+                        R.string.toast_account_not_found, Toast.LENGTH_LONG
                 ).show();
                 finish();
             } else if (authority == null) {

@@ -231,7 +231,7 @@ public abstract class Util {
         if (account == null) {
             Log.w(LOG_TAG, "account == null");
             Toast.makeText(context.getApplicationContext(),
-                    R.string.toast_an_error_occurred, Toast.LENGTH_SHORT
+                    R.string.toast_account_not_found, Toast.LENGTH_LONG
             ).show();
             return false;
         } else if (authority == null) {

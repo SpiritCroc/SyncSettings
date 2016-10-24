@@ -168,8 +168,10 @@ public class SelectSyncActivity extends AppCompatActivity {
         menu.findItem(R.id.undo_selection).setVisible(multiSelectMode &&
                 !multiSelectSyncs.isEmpty());
 
-        menu.findItem(R.id.expand_all).setVisible(!listAdapter.allGroupsExpanded());
-        menu.findItem(R.id.collapse_all).setVisible(!listAdapter.allGroupsCollapsed());
+        menu.findItem(R.id.expand_all).setVisible(listAdapter != null &&
+                !listAdapter.allGroupsExpanded());
+        menu.findItem(R.id.collapse_all).setVisible(listAdapter != null &&
+                !listAdapter.allGroupsCollapsed());
         return super.onPrepareOptionsMenu(menu);
     }
 

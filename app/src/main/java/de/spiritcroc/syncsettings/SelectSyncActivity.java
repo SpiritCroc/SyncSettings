@@ -400,11 +400,20 @@ public class SelectSyncActivity extends AppCompatActivity {
                 new SimpleCheckableExpandableListAdapter.OnAdapterUpdateListener() {
                     @Override
                     public void onCheckboxClick(CheckBox cb, int groupPosition, int childPosition) {
-                        onSyncClick(groupPosition, childPosition, cb);
+                        if (SimpleCheckableExpandableListAdapter.Position.isGroup(childPosition)) {
+                            onGroupCheckboxClick(groupPosition, cb);
+                        } else {
+                            onSyncClick(groupPosition, childPosition, cb);
+                        }
                     }
                     @Override
                     public boolean shouldBeChecked(int groupPosition, int childPosition) {
-                        return multiSelectSyncs.contains(getSyncForPosition(groupPosition, childPosition));
+                        if (SimpleCheckableExpandableListAdapter.Position.isGroup(childPosition)) {
+                            return partOfGroupSelected(groupPosition);
+                        } else {
+                            return multiSelectSyncs
+                                    .contains(getSyncForPosition(groupPosition, childPosition));
+                        }
                     }
                     @Override
                     public void onGroupExpandOrCollapse() {
@@ -425,7 +434,7 @@ public class SelectSyncActivity extends AppCompatActivity {
                 },
 
                 groupData,
-                android.R.layout.simple_expandable_list_item_1,
+                itemLayoutId,
                 new String[] {ROOT},
                 new int[] {android.R.id.text1},
 
@@ -514,17 +523,20 @@ public class SelectSyncActivity extends AppCompatActivity {
             if (clickedSync.account == null) {
                 // Master sync setting
             } else if (multiSelectMode) {
-                boolean previousEmpty = multiSelectSyncs.isEmpty();
-                boolean previousFull = multiSelectSyncs.size() == syncs.size();
+                boolean previousGroupSelected = partOfGroupSelected(groupPosition);
+                UpdateSelectionChecker updateChecker = new UpdateSelectionChecker();
+
                 if (cb.isChecked()) {
                     multiSelectSyncs.add(clickedSync);
                 } else {
                     multiSelectSyncs.remove(clickedSync);
                 }
-                if (previousEmpty != multiSelectSyncs.isEmpty() ||
-                        previousFull != (multiSelectSyncs.size() == syncs.size())) {
-                    invalidateOptionsMenu();
+
+                updateChecker.update();
+                if (previousGroupSelected != partOfGroupSelected(groupPosition)) {
+                    listAdapter.notifyDataSetInvalidated();
                 }
+
                 if (DEBUG) {
                     Log.v(LOG_TAG, "Selected syncs:");
                     for (int j = 0; j < multiSelectSyncs.size(); j++) {
@@ -536,6 +548,26 @@ public class SelectSyncActivity extends AppCompatActivity {
             }
         }
         return true;
+    }
+
+    private void onGroupCheckboxClick(int groupPosition, CheckBox cb) {
+        UpdateSelectionChecker updateChecker = new UpdateSelectionChecker();
+
+        ArrayList<Sync> syncs = getSyncsForGroup(groupPosition);
+        if (cb.isChecked()) {
+            for (int i = 0; i < syncs.size(); i++) {
+                if (!multiSelectSyncs.contains(syncs.get(i))) {
+                    multiSelectSyncs.add(syncs.get(i));
+                }
+            }
+        } else {
+            for (int i = 0; i < syncs.size(); i++) {
+                multiSelectSyncs.remove(syncs.get(i));
+            }
+        }
+        listAdapter.notifyDataSetInvalidated();
+
+        updateChecker.update();
     }
 
     private void selectAction(Sync sync) {
@@ -604,6 +636,42 @@ public class SelectSyncActivity extends AppCompatActivity {
         return null;
     }
 
+    private ArrayList<Sync> getSyncsForGroup(int groupPosition) {
+        ArrayList<Sync> list = new ArrayList<>();
+        for (int i = 0; i < syncs.size(); i++) {
+            if (syncs.get(i).account == null) {
+                // Irrelevant, master sync settings already checked
+                continue;
+            }
+            if (syncs.get(i).account.equals(groups.get(groupPosition))) {
+                list.add(syncs.get(i));
+            }
+        }
+        return list;
+    }
+
+    private boolean fullGroupSelected(int groupPosition) {
+        boolean allSelected = true;
+        ArrayList<Sync> syncs = getSyncsForGroup(groupPosition);
+        for (int i = 0; i < syncs.size(); i++) {
+            if (!multiSelectSyncs.contains(syncs.get(i))) {
+                allSelected = false;
+                break;
+            }
+        }
+        return allSelected;
+    }
+
+    private boolean partOfGroupSelected(int groupPosition) {
+        ArrayList<Sync> syncs = getSyncsForGroup(groupPosition);
+        for (int i = 0; i < syncs.size(); i++) {
+            if (multiSelectSyncs.contains(syncs.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private class Sync {
         private Account account;
         private String authority;
@@ -629,6 +697,21 @@ public class SelectSyncActivity extends AppCompatActivity {
                         (this.authority == null || this.authority.equals(s.authority));
             }
             return false;
+        }
+    }
+
+    private class UpdateSelectionChecker {
+        boolean previousEmpty;
+        boolean previousFull;
+        UpdateSelectionChecker() {
+            previousEmpty = multiSelectSyncs.isEmpty();
+            previousFull = multiSelectSyncs.size() == syncs.size();
+        }
+        void update() {
+            if (previousEmpty != multiSelectSyncs.isEmpty() ||
+                    previousFull != (multiSelectSyncs.size() == syncs.size())) {
+                invalidateOptionsMenu();
+            }
         }
     }
 }

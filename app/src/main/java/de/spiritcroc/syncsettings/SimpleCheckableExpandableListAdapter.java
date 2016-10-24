@@ -95,6 +95,9 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
         View cb = v.findViewById(android.R.id.checkbox);
         if (cb instanceof CheckBox) {
             cb.setOnClickListener(checkboxOnClickListener);
+            cb.setTag(new Position(groupPosition, Position.IS_GROUP_CHILD_POSITION));
+            ((CheckBox) cb).setChecked(updateListener.shouldBeChecked(groupPosition,
+                    Position.IS_GROUP_CHILD_POSITION));
         }
         ((TextView) v.findViewById(android.R.id.text1)).setTextColor(
                 updateListener.getTextColorForGroup(groupPosition)
@@ -168,12 +171,16 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
         }
     };
 
-    public class Position {
+    public static class Position {
+        final static int IS_GROUP_CHILD_POSITION = -1;
         int groupPosition;
         int childPosition;
         public Position(int groupPosition, int childPosition) {
             this.groupPosition = groupPosition;
             this.childPosition = childPosition;
+        }
+        public static boolean isGroup(int childPosition) {
+            return childPosition == IS_GROUP_CHILD_POSITION;
         }
     }
 

@@ -30,4 +30,12 @@
         <item name="android:paddingBottom">@dimen/button_padding</item>
         <item name="android:paddingTop">@dimen/button_padding</item>
     </style>
+
+    <style name="Divider">
+        <item name="android:background">#40ffffff</item>
+    </style>
+
+    <style name="ClickableAboutView">
+        <item name="android:background">@android:drawable/list_selector_background</item>
+    </style>
 </resources>

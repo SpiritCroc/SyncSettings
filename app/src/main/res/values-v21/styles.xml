@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2015 SpiritCroc
+    Copyright (C) 2017 SpiritCroc
     Email: spiritcroc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -18,14 +18,7 @@
 -->
 
 <resources>
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="about_activity_view_padding">8dp</dimen>
-
-    <dimen name="text_size_title">24sp</dimen>
-    <dimen name="text_size_title_small">20sp</dimen>
-    <dimen name="text_size_summary">12sp</dimen>
-    <dimen name="button_padding">16dp</dimen>
-
-    <dimen name="checkbox_padding">4dp</dimen>
+    <style name="ClickableAboutView">
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
 </resources>

@@ -64,4 +64,11 @@
 
     <string name="toast_account_not_found">Sync Settings: Error: Could not retrieve account</string>
     <string name="toast_an_error_occurred">Sync Settings: An error occurred</string>
+
+    <string name="about_how_to_use_title">How to use</string>
+    <string name="about_how_to_use_summary">There are two possibilities of using this app:\n\na)\nUse Locale/Tasker/LLama or a similar application that uses the Locale API and select Sync Settings as action plug-in.\n\nb)\nIf your launcher supports creating app specific shortcuts, Sync Settings will be listed there as well.</string>
+    <string name="about_source_code_title">Source code</string>
+    <string name="about_source_code_link" translatable="false">https://github.com/SpiritCroc/SyncSettings</string>
+    <string name="about_privacy_policy_title">Privacy policy</string>
+    <string name="about_privacy_policy_link">https://sites.google.com/site/spiritcroc/apps/syncsettings/privacy</string>
 </resources>

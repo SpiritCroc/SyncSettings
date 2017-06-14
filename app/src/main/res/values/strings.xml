@@ -62,6 +62,7 @@
     <string name="shortcut_sync_master_on">Enable auto sync</string>
     <string name="shortcut_sync_master_off">Disable auto sync</string>
     <string name="shortcut_sync_master_toggle">Toggle auto sync</string>
+    <string name="shortcut_sync_mutliple_authorities">multiple data</string>
 
     <string name="toast_account_not_found">Sync Settings: Error: Could not retrieve account</string>
     <string name="toast_an_error_occurred">Sync Settings: An error occurred</string>

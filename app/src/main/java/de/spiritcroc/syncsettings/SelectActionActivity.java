@@ -162,13 +162,15 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
             localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_SYNC_NOW);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     account == null ?  getString(R.string.shortcut_sync_now_multi_select) :
-                    getString(R.string.shortcut_sync_now, account.name, authority)
+                    getString(R.string.shortcut_sync_now, account.name,
+                            Util.authorityToReadableString(this, authority))
             );
         } else if (view.equals(forceSyncNowButton)) {
             localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_FORCE_SYNC_NOW);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     account == null ? getString(R.string.shortcut_force_sync_now_multi_select) :
-                    getString(R.string.shortcut_force_sync_now, account.name, authority)
+                    getString(R.string.shortcut_force_sync_now, account.name,
+                            Util.authorityToReadableString(this, authority))
             );
         } else if (view.equals(autoSyncOnButton)) {
             Util.maybeRequestPermissions(this,
@@ -177,7 +179,8 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
             localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_ON);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     account == null ? getString(R.string.shortcut_auto_sync_on_multi_select) :
-                    getString(R.string.shortcut_auto_sync_on, account.name, authority)
+                    getString(R.string.shortcut_auto_sync_on, account.name,
+                            Util.authorityToReadableString(this, authority))
             );
         } else if (view.equals(autoSyncOffButton)) {
             Util.maybeRequestPermissions(this,
@@ -186,7 +189,8 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
             localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_OFF);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     account == null ? getString(R.string.shortcut_auto_sync_off_multi_select) :
-                    getString(R.string.shortcut_auto_sync_off, account.name, authority)
+                    getString(R.string.shortcut_auto_sync_off, account.name,
+                            Util.authorityToReadableString(this, authority))
             );
         } else if (view.equals(autoSyncToggleButton)) {
             Util.maybeRequestPermissions(this,
@@ -196,7 +200,8 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
             localeBundle.putString(Constants.EXTRA_ACTION, Constants.ACTION_AUTO_SYNC_TOGGLE);
             result.putExtra(com.twofortyfouram.locale.api.Intent.EXTRA_STRING_BLURB,
                     account == null ? getString(R.string.shortcut_auto_sync_toggle_multi_select) :
-                    getString(R.string.shortcut_auto_sync_toggle, account.name, authority)
+                    getString(R.string.shortcut_auto_sync_toggle, account.name,
+                            Util.authorityToReadableString(this, authority))
             );
         } else {
             Log.w(LOG_TAG, "onClick for unknown view");

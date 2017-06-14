@@ -27,9 +27,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SyncAdapterType;
 import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -326,5 +329,29 @@ public abstract class Util {
             }
             ActivityCompat.requestPermissions(activity, require, 0);
         }
+    }
+
+    public static String authorityToReadableString(PackageManager pm, String authority) {
+        ProviderInfo pi = pm.resolveContentProvider(authority, 0);
+        String result = null;
+        if (pi != null) {
+            result = (String) pi.loadLabel(pm);
+        }
+        if (TextUtils.isEmpty(result)) {
+            result = authority;
+        }
+        return result;
+    }
+
+    /**
+     * In comparison to authorityToReadableString(PackageManager pm, String authority),
+     * treats null-authorities as multiple authorities
+     */
+    public static String authorityToReadableString(Context context, @Nullable String authority) {
+        String result = authorityToReadableString(context.getPackageManager(), authority);
+        if (result == null) {
+            return context.getString(R.string.shortcut_sync_mutliple_authorities);
+        }
+        return result;
     }
 }

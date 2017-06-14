@@ -367,7 +367,11 @@ public class SelectSyncActivity extends AppCompatActivity {
             // Add account data:
             listOfChildGroups.add(masterChildGroup);
         }
+
         final ArrayList<Integer> initExpandedGroups = new ArrayList<>();
+
+        // Add items
+        final PackageManager pm = getPackageManager();
         for (int i = 0; i < groups.size(); i++) {
             final int currentGroup = i + (multiSelectMode ? 0 : 1);
 
@@ -377,8 +381,9 @@ public class SelectSyncActivity extends AppCompatActivity {
                 for (int j = 0; j < syncs.size(); j++) {
                     final Sync sync = syncs.get(j);
                     if (sync.account != null && sync.account.equals(groups.get(x))) {
+                        final String entry = Util.authorityToReadableString(pm, sync.authority);
                         add(new HashMap<String, String>() {{
-                            put(CHILD, sync.authority);
+                            put(CHILD, entry);
                         }});
                         if (initSelectedSyncs.contains(sync)) {
                             initSelectedSyncPositions.add(new SyncListPos(currentGroup, childCount));

@@ -206,7 +206,7 @@ public class SelectSyncActivity extends AppCompatActivity {
             case R.id.detailed_information:
                 detailedInformation = !detailedInformation;
                 item.setChecked(detailedInformation);
-                loadSyncs(false, null);
+                loadSyncs(false, 0);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -270,7 +270,7 @@ public class SelectSyncActivity extends AppCompatActivity {
         }
 
         syncs.clear();
-        if (groupOffsetToPrevious != null) {
+        if (groupOffsetToPrevious != null && groupOffsetToPrevious != 0) {
             // We changed the list content, so reset selected syncs
             multiSelectSyncs = (ArrayList<Sync>) initSelectedSyncs.clone();
         }
@@ -385,7 +385,6 @@ public class SelectSyncActivity extends AppCompatActivity {
         final ArrayList<Integer> initExpandedGroups = new ArrayList<>();
 
         // Add items
-        final PackageManager pm = getPackageManager();
         for (int i = 0; i < groups.size(); i++) {
             final int currentGroup = i + (multiSelectMode ? 0 : 1);
 

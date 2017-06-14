@@ -372,8 +372,8 @@ public abstract class Util {
     }
 
     /**
-     * In comparison to authorityToReadableString(PackageManager pm, String authority),
-     * treats null-authorities as multiple authorities
+     * Treats authority==null as multiple authorities
+     * (the other authorityToReadableString() doesn't, but returns null instead)
      */
     public static String authorityToReadableString(Context context, @Nullable String authority) {
         String result = authorityToReadableString(context, authority, false);

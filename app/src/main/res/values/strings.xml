@@ -36,7 +36,7 @@
     <string name="off">Off</string>
     <string name="toggle">Toggle</string>
 
-    <string name="sync_master">Master auto sync (all accounts)</string>
+    <string name="sync_master">Global setting (all accounts)</string>
     <string name="sync_master_on">@string/on</string>
     <string name="sync_master_off">@string/off</string>
     <string name="sync_master_toggle">@string/toggle</string>

@@ -28,6 +28,7 @@
     <string name="action_undo_selection">Undo selection</string>
     <string name="action_expand_all">Expand all</string>
     <string name="action_collapse_all">Collapse all</string>
+    <string name="action_detailed_information">Detailed</string>
 
     <string name="enter_shortcut_name">Enter shortcut name:</string>
 
@@ -40,6 +41,8 @@
     <string name="sync_master_off">@string/off</string>
     <string name="sync_master_toggle">@string/toggle</string>
     <string name="sync_account">%1$s (%2$s)</string><!-- 1: name, 2: account -->
+    <string name="sync_account_detailed">%1$s - %2$s</string>
+    <string name="sync_authority_detailed">%1$s (%2$s)</string>
 
     <string name="sync_now">Request sync:</string>
     <string name="auto_sync">Auto sync:</string>

@@ -59,6 +59,7 @@ public class SelectSyncActivity extends AppCompatActivity {
     private ArrayList<Sync> syncs;
 
     private boolean multiSelectMode = false;
+    private boolean detailedInformation = false;
     private ArrayList<Sync> multiSelectSyncs = new ArrayList<>();
     private ArrayList<Sync> initSelectedSyncs = new ArrayList<>();
     private ArrayList<SyncListPos> initSelectedSyncPositions = new ArrayList<>();
@@ -171,6 +172,9 @@ public class SelectSyncActivity extends AppCompatActivity {
                 !listAdapter.allGroupsExpanded());
         menu.findItem(R.id.collapse_all).setVisible(listAdapter != null &&
                 !listAdapter.allGroupsCollapsed());
+
+        menu.findItem(R.id.detailed_information).setChecked(detailedInformation);
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -198,6 +202,11 @@ public class SelectSyncActivity extends AppCompatActivity {
                 return true;
             case R.id.collapse_all:
                 listAdapter.collapseAll(listView);
+                return true;
+            case R.id.detailed_information:
+                detailedInformation = !detailedInformation;
+                item.setChecked(detailedInformation);
+                loadSyncs(false, null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -261,7 +270,10 @@ public class SelectSyncActivity extends AppCompatActivity {
         }
 
         syncs.clear();
-        multiSelectSyncs = (ArrayList<Sync>) initSelectedSyncs.clone();
+        if (groupOffsetToPrevious != null) {
+            // We changed the list content, so reset selected syncs
+            multiSelectSyncs = (ArrayList<Sync>) initSelectedSyncs.clone();
+        }
         initSelectedSyncPositions.clear();
 
         if (!multiSelectMode) {
@@ -342,7 +354,8 @@ public class SelectSyncActivity extends AppCompatActivity {
             for (int i = 0; i < groups.size(); i++) {
                 final int j = i;
                 add(new HashMap<String, String>() {{
-                    put(ROOT, Util.accountToReadableString(SelectSyncActivity.this, groups.get(j)));
+                    put(ROOT, Util.accountToReadableString(SelectSyncActivity.this, groups.get(j),
+                            detailedInformation));
                 }});
             }
         }};
@@ -382,7 +395,8 @@ public class SelectSyncActivity extends AppCompatActivity {
                 for (int j = 0; j < syncs.size(); j++) {
                     final Sync sync = syncs.get(j);
                     if (sync.account != null && sync.account.equals(groups.get(x))) {
-                        final String entry = Util.authorityToReadableString(pm, sync.authority);
+                        final String entry = Util.authorityToReadableString(SelectSyncActivity.this,
+                                sync.authority, detailedInformation);
                         add(new HashMap<String, String>() {{
                             put(CHILD, entry);
                         }});

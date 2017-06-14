@@ -332,7 +332,7 @@ public abstract class Util {
         }
     }
 
-    public static String accountToReadableString(Context context, Account account) {
+    public static String accountToReadableString(Context context, Account account, boolean detailed) {
         PackageManager pm = context.getPackageManager();
         String result = null;
         for (AuthenticatorDescription d: AccountManager.get(context).getAuthenticatorTypes()) {
@@ -350,11 +350,14 @@ public abstract class Util {
         }
         if (TextUtils.isEmpty(result)) {
             result = account.type;
+        } else if (detailed) {
+            result = context.getString(R.string.sync_account_detailed, result, account.type);
         }
         return context.getString(R.string.sync_account, account.name, result);
     }
 
-    public static String authorityToReadableString(PackageManager pm, String authority) {
+    public static String authorityToReadableString(Context context, String authority, boolean detailed) {
+        PackageManager pm = context.getPackageManager();
         ProviderInfo pi = pm.resolveContentProvider(authority, 0);
         String result = null;
         if (pi != null) {
@@ -362,6 +365,8 @@ public abstract class Util {
         }
         if (TextUtils.isEmpty(result)) {
             result = authority;
+        } else if (detailed) {
+            result = context.getString(R.string.sync_authority_detailed, result, authority);
         }
         return result;
     }
@@ -371,7 +376,7 @@ public abstract class Util {
      * treats null-authorities as multiple authorities
      */
     public static String authorityToReadableString(Context context, @Nullable String authority) {
-        String result = authorityToReadableString(context.getPackageManager(), authority);
+        String result = authorityToReadableString(context, authority, false);
         if (result == null) {
             return context.getString(R.string.shortcut_sync_mutliple_authorities);
         }

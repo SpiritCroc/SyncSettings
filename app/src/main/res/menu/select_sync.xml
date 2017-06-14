@@ -10,7 +10,8 @@
         android:id="@+id/multi_select"
         android:checkable="true"
         android:checked="false"
-        android:title="@string/action_select_multiple" />
+        android:title="@string/action_select_multiple"
+        app:showAsAction="never" />
     <item
         android:id="@+id/expand_all"
         android:title="@string/action_expand_all"
@@ -31,4 +32,10 @@
         android:title="@string/action_undo_selection"
         android:icon="@drawable/ic_undo_white_24dp"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/detailed_information"
+        android:checkable="true"
+        android:checked="false"
+        android:title="@string/action_detailed_information"
+        app:showAsAction="never" />
 </menu>

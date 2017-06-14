@@ -39,6 +39,7 @@
     <string name="sync_master_on">@string/on</string>
     <string name="sync_master_off">@string/off</string>
     <string name="sync_master_toggle">@string/toggle</string>
+    <string name="sync_account">%1$s (%2$s)</string><!-- 1: name, 2: account -->
 
     <string name="sync_now">Request sync:</string>
     <string name="auto_sync">Auto sync:</string>

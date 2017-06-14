@@ -341,7 +341,7 @@ public class SelectSyncActivity extends AppCompatActivity {
             for (int i = 0; i < groups.size(); i++) {
                 final int j = i;
                 add(new HashMap<String, String>() {{
-                    put(ROOT, groups.get(j).name + " (" + groups.get(j).type + ")");
+                    put(ROOT, getString(R.string.sync_account, groups.get(j).name, groups.get(j).type));
                 }});
             }
         }};

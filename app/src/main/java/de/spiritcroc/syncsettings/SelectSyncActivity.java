@@ -21,7 +21,6 @@ package de.spiritcroc.syncsettings;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -312,9 +311,11 @@ public class SelectSyncActivity extends AppCompatActivity {
         for (Account account: accounts) {
             if (DEBUG) Log.d(LOG_TAG, "Found account " + account.name);
             for (int i = 0; i < authorities.size(); i++) {
-                if (ContentResolver.getIsSyncable(account, authorities.get(i)) > 0) {
+                if (Util.shouldShowSync(account, authorities.get(i))) {
                     syncs.add(new Sync(account, authorities.get(i)));
                     if (DEBUG) Log.d(LOG_TAG, "Added authority " + authorities.get(i));
+                } else {
+                    if (DEBUG) Log.d(LOG_TAG, "Ignored authority " + authorities.get(i));
                 }
             }
         }
@@ -681,7 +682,7 @@ public class SelectSyncActivity extends AppCompatActivity {
         return null;
     }
 
-    private class Sync {
+    class Sync {
         private Account account;
         private String authority;
         public Sync(Account account, String authority) {

@@ -354,4 +354,9 @@ public abstract class Util {
         }
         return result;
     }
+
+    public static boolean shouldShowSync(Account account, String authority) {
+        return ContentResolver.getIsSyncable(account, authority) > 0
+                && (!DemonstrationHelper.ENABLED || DemonstrationHelper.isSyncWhiteListed(account, authority));
+    }
 }

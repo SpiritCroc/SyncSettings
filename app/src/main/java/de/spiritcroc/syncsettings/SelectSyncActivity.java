@@ -108,14 +108,14 @@ public class SelectSyncActivity extends AppCompatActivity {
             if (localeBundle == null) {
                 Log.w(LOG_TAG, "Intent has locale bundle which is null");
             } else {
-                if (intent.hasExtra(Constants.EXTRA_ACCOUNT_STRING)) {
-                    addInitSync(intent.getStringExtra(Constants.EXTRA_ACCOUNT_STRING),
-                            intent.getStringExtra(Constants.EXTRA_AUTHORITY));
-                } else if (intent.hasExtra(Constants.EXTRA_ACCOUNT_STRING_ARRAY)) {
+                if (localeBundle.containsKey(Constants.EXTRA_ACCOUNT_STRING)) {
+                    addInitSync(localeBundle.getString(Constants.EXTRA_ACCOUNT_STRING),
+                            localeBundle.getString(Constants.EXTRA_AUTHORITY));
+                } else if (localeBundle.containsKey(Constants.EXTRA_ACCOUNT_STRING_ARRAY)) {
                     String[] accountStringArray =
-                            intent.getStringArrayExtra(Constants.EXTRA_ACCOUNT_STRING_ARRAY);
+                            localeBundle.getStringArray(Constants.EXTRA_ACCOUNT_STRING_ARRAY);
                     String[] authorityArray =
-                            intent.getStringArrayExtra(Constants.EXTRA_AUTHORITY_ARRAY);
+                            localeBundle.getStringArray(Constants.EXTRA_AUTHORITY_ARRAY);
                     if (accountStringArray != null && authorityArray != null &&
                             accountStringArray.length == authorityArray.length) {
                         for (int i = 0; i < accountStringArray.length; i++) {
@@ -129,9 +129,10 @@ public class SelectSyncActivity extends AppCompatActivity {
                     expandFirst = true;
                 }
             }
-            if (!initSelectedSyncs.isEmpty()) {
+            if (initSelectedSyncs.size() > 1) {
                 multiSelectMode = true;
             }
+            multiSelectSyncs = (ArrayList<Sync>) initSelectedSyncs.clone();
         }
 
         loadSyncs(false, null);
@@ -270,10 +271,12 @@ public class SelectSyncActivity extends AppCompatActivity {
         }
 
         syncs.clear();
+        /* Remember selected syncs
         if (groupOffsetToPrevious != null && groupOffsetToPrevious != 0) {
             // We changed the list content, so reset selected syncs
             multiSelectSyncs = (ArrayList<Sync>) initSelectedSyncs.clone();
         }
+        */
         initSelectedSyncPositions.clear();
 
         if (!multiSelectMode) {

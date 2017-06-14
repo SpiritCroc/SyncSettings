@@ -27,9 +27,10 @@
         android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"
         android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
         android:paddingRight="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:textAppearance="?android:attr/textAppearanceListItem"
         android:gravity="center_vertical|start"
         android:textAlignment="viewStart" />
-    <CheckBox
+    <com.buildware.widget.indeterm.IndeterminateCheckBox
         android:id="@android:id/checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

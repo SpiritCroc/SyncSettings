@@ -20,6 +20,7 @@ package de.spiritcroc.syncsettings;
 
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,8 @@ import android.widget.CheckBox;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
+
+import com.buildware.widget.indeterm.IndeterminateCheckBox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,10 +80,10 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
                              View convertView, ViewGroup parent) {
         View v = super.getChildView(groupPosition, childPosition, isLastChild, convertView, parent);
         View cb = v.findViewById(android.R.id.checkbox);
-        if (cb instanceof CheckBox) {
+        if (cb instanceof IndeterminateCheckBox) {
             cb.setOnClickListener(checkboxOnClickListener);
             cb.setTag(new Position(groupPosition, childPosition));
-            ((CheckBox) cb).setChecked(updateListener.shouldBeChecked(groupPosition, childPosition));
+            ((IndeterminateCheckBox) cb).setState(updateListener.getCheckedStateFor(groupPosition, childPosition));
         }
         ((TextView) v.findViewById(android.R.id.text1)).setTextColor(
                 updateListener.getTextColorForPosition(groupPosition, childPosition)
@@ -93,10 +96,10 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
                              ViewGroup parent) {
         View v = super.getGroupView(groupPosition, isExpanded, convertView, parent);
         View cb = v.findViewById(android.R.id.checkbox);
-        if (cb instanceof CheckBox) {
+        if (cb instanceof IndeterminateCheckBox) {
             cb.setOnClickListener(checkboxOnClickListener);
             cb.setTag(new Position(groupPosition, Position.IS_GROUP_CHILD_POSITION));
-            ((CheckBox) cb).setChecked(updateListener.shouldBeChecked(groupPosition,
+            ((IndeterminateCheckBox) cb).setState(updateListener.getCheckedStateFor(groupPosition,
                     Position.IS_GROUP_CHILD_POSITION));
         }
         ((TextView) v.findViewById(android.R.id.text1)).setTextColor(
@@ -186,7 +189,7 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
 
     public interface OnAdapterUpdateListener {
         void onCheckboxClick(CheckBox cb, int groupPosition, int childPosition);
-        boolean shouldBeChecked(int groupPosition, int childPosition);
+        @Nullable Boolean getCheckedStateFor(int groupPosition, int childPosition);
         void onGroupExpandOrCollapse();
         int getTextColorForPosition(int groupPosition, int childPosition);
         int getTextColorForGroup(int groupPosition);

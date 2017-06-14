@@ -407,9 +407,9 @@ public class SelectSyncActivity extends AppCompatActivity {
                         }
                     }
                     @Override
-                    public boolean shouldBeChecked(int groupPosition, int childPosition) {
+                    public Boolean getCheckedStateFor(int groupPosition, int childPosition) {
                         if (SimpleCheckableExpandableListAdapter.Position.isGroup(childPosition)) {
-                            return partOfGroupSelected(groupPosition);
+                            return getGroupState(groupPosition);
                         } else {
                             return multiSelectSyncs
                                     .contains(getSyncForPosition(groupPosition, childPosition));
@@ -523,7 +523,7 @@ public class SelectSyncActivity extends AppCompatActivity {
             if (clickedSync.account == null) {
                 // Master sync setting
             } else if (multiSelectMode) {
-                boolean previousGroupSelected = partOfGroupSelected(groupPosition);
+                Boolean previousGroupSelected = getGroupState(groupPosition);
                 UpdateSelectionChecker updateChecker = new UpdateSelectionChecker();
 
                 if (cb.isChecked()) {
@@ -533,7 +533,7 @@ public class SelectSyncActivity extends AppCompatActivity {
                 }
 
                 updateChecker.update();
-                if (previousGroupSelected != partOfGroupSelected(groupPosition)) {
+                if (previousGroupSelected != getGroupState(groupPosition)) {
                     listAdapter.notifyDataSetInvalidated();
                 }
 
@@ -650,26 +650,30 @@ public class SelectSyncActivity extends AppCompatActivity {
         return list;
     }
 
-    private boolean fullGroupSelected(int groupPosition) {
-        boolean allSelected = true;
+    /**
+     * @return
+     * False - no item in the group is checked
+     * True - all items in the group are checked
+     * Null - some, but not all items in the group are checked
+     */
+    private Boolean getGroupState(int groupPosition) {
         ArrayList<Sync> syncs = getSyncsForGroup(groupPosition);
-        for (int i = 0; i < syncs.size(); i++) {
-            if (!multiSelectSyncs.contains(syncs.get(i))) {
-                allSelected = false;
-                break;
-            }
-        }
-        return allSelected;
-    }
-
-    private boolean partOfGroupSelected(int groupPosition) {
-        ArrayList<Sync> syncs = getSyncsForGroup(groupPosition);
+        boolean someIn = false;
+        boolean allIn = true;
         for (int i = 0; i < syncs.size(); i++) {
             if (multiSelectSyncs.contains(syncs.get(i))) {
-                return true;
+                someIn = true;
+            } else {
+                allIn = false;
             }
         }
-        return false;
+        if (!someIn) {
+            return false;
+        }
+        if (allIn) {
+            return true;
+        }
+        return null;
     }
 
     private class Sync {

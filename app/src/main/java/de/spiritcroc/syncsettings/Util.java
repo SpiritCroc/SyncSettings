@@ -21,6 +21,7 @@ package de.spiritcroc.syncsettings;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AuthenticatorDescription;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -329,6 +330,28 @@ public abstract class Util {
             }
             ActivityCompat.requestPermissions(activity, require, 0);
         }
+    }
+
+    public static String accountToReadableString(Context context, Account account) {
+        PackageManager pm = context.getPackageManager();
+        String result = null;
+        for (AuthenticatorDescription d: AccountManager.get(context).getAuthenticatorTypes()) {
+            if (account.type.equals(d.type)) {
+                try {
+                    result = pm.getResourcesForApplication(d.packageName).getString(d.labelId);
+                } catch (Exception e) {
+                    if (DEBUG) {
+                        Log.i(LOG_TAG, "accountToReadableString() got exception: "
+                                + e.getMessage());
+                    }
+                }
+                break;
+            }
+        }
+        if (TextUtils.isEmpty(result)) {
+            result = account.type;
+        }
+        return context.getString(R.string.sync_account, account.name, result);
     }
 
     public static String authorityToReadableString(PackageManager pm, String authority) {

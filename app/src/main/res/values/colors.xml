@@ -21,4 +21,6 @@
     <color name="default_text_color">#ffffffff</color>
     <color name="init_select_text_color">#ff80cbc4</color>
     <color name="group_text_color">#ffffc107</color>
+
+    <color name="ic_launcher_background">#424242</color>
 </resources>

@@ -76,10 +76,40 @@
     <string name="toast_an_error_occurred">Sync Settings: An error occurred</string>
     <string name="toast_broken_shortcut">Sync Settings: broken action</string>
 
-    <string name="about_how_to_use_title">How to use</string>
-    <string name="about_how_to_use_summary">There are two possibilities of using this app:\n\na)\nUse Locale/Tasker/LLama or a similar application that uses the Locale API and select Sync Settings as action plug-in.\n\nb)\nIf your launcher supports creating app specific shortcuts, Sync Settings will be listed there as well.</string>
-    <string name="about_source_code_title">Source code</string>
-    <string name="about_source_code_link" translatable="false">https://github.com/SpiritCroc/SyncSettings</string>
-    <string name="about_privacy_policy_title">Privacy policy</string>
-    <string name="about_privacy_policy_link">https://sites.google.com/site/spiritcroc/apps/syncsettings/privacy</string>
+    <string name="about_html"><![CDATA[
+        <style media=\"screen\" type=\"text/css\">
+            body {
+                color: ?android:attr/textColorSecondary ;
+            }
+            h1 {
+                color: ?android:attr/textColorPrimary ;
+            }
+            h2 {
+                color: ?android:attr/colorAccent ;
+            }
+            a:link {
+                color: ?android:attr/colorAccent ;
+            }
+            a:visited {
+                color: ?android:attr/colorAccent ;
+            }
+        </style>
+
+        <body>
+        <h1>How to use</h1>
+        There are two ways of using this app:
+        <h2>Use the Locale API</h2>
+        To use Sync Settings together with <b>Locale</b>, <b>Tasker</b>, <b>LLama</b> or a similar application that uses the Locale API, select Sync Settings as <b>action plug-in</b>.
+        <h2>Create a launcher shortcut</h2>
+        Some launchers allow adding application specific shortcuts from a dedicated app shortcuts screen.<br>
+        Most common launchers allow adding application specific shortcuts from their widgets screen.
+
+        <h1>Source code</h1>
+        <a href="https://github.com/SpiritCroc/SyncSettings">github.com/SpiritCroc/SyncSettings</a>
+
+        <h1>Privacy policy</h1>
+        <a href="http://spiritcroc.de/android/apps/syncsettings/privacy/">spiritcroc.de/android/apps/syncsettings/privacy</a>
+        </body>
+    ]]></string>
+
 </resources>

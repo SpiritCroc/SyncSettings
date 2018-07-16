@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016
+ * Copyright (C) 2016-2018
  * Email: spiritcroc@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
@@ -101,6 +101,13 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
             cb.setTag(new Position(groupPosition, Position.IS_GROUP_CHILD_POSITION));
             ((IndeterminateCheckBox) cb).setState(updateListener.getCheckedStateFor(groupPosition,
                     Position.IS_GROUP_CHILD_POSITION));
+
+            if (getChildrenCount(groupPosition) == 0) {
+                // No children -> disable checkbox
+                cb.setVisibility(View.GONE);
+            } else {
+                cb.setVisibility(View.VISIBLE);
+            }
         }
         ((TextView) v.findViewById(android.R.id.text1)).setTextColor(
                 updateListener.getTextColorForGroup(groupPosition)
@@ -111,6 +118,10 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
     @Override
     public void onGroupExpanded(int groupPosition) {
         super.onGroupExpanded(groupPosition);
+        if (getChildrenCount(groupPosition) == 0) {
+            if (DEBUG) Log.v(LOG_TAG, "Ignore expand of empty group " + groupPosition);
+            return;
+        }
         if (DEBUG) Log.v(LOG_TAG, "Expanded " + groupPosition);
         if (!expandedGroups.contains(groupPosition)) {
             expandedGroups.add(groupPosition);
@@ -129,21 +140,42 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
     public void restoreExpandedGroups(ExpandableListView ls, ArrayList<Integer> expandedGroups,
                                       int offset) {
         if (DEBUG) Log.v(LOG_TAG, "Restore expanded groups: " + expandedGroups.size());
-        for (int i = 0; i < expandedGroups.size(); i++) {
-            int group = expandedGroups.get(i) + offset;
-            if (group >= 0) {
-                if (DEBUG) Log.v(LOG_TAG, "\t\texpand " + group);
+        for (int group = 0; group < getGroupCount(); group++) {
+            if (getChildrenCount(group) == 0) {
+                // Keep empty groups "expanded" for expand indicator workaround, see
+                // drawable/expand_indicator.xml
                 ls.expandGroup(group);
+                if (DEBUG) Log.v(LOG_TAG, "\t\texpand empty " + group);
+            } else {
+                int originalGroup = group - offset;
+                if (expandedGroups.contains(originalGroup)) {
+                    ls.expandGroup(group);
+                    if (DEBUG) Log.v(LOG_TAG, "\t\texpand " + group);
+                } else {
+                    if (DEBUG) Log.v(LOG_TAG, "\t\tdon't expand" + group);
+                }
             }
         }
     }
 
     public boolean allGroupsCollapsed() {
-        return expandedGroups.isEmpty();
+        for (Integer group: expandedGroups) {
+            // We don't care about empty groups
+            if (getChildrenCount(group) > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean allGroupsExpanded() {
-        return expandedGroups.size() == getGroupCount();
+        for (int group = 0; group < getGroupCount(); group++) {
+            // We don't care about empty groups
+            if (getChildrenCount(group) > 0 && !expandedGroups.contains(group)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void expandAll(ExpandableListView ls) {
@@ -155,7 +187,11 @@ public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAd
 
     public void collapseAll(ExpandableListView ls) {
         for (int i = 0; i < getGroupCount(); i++) {
-            ls.collapseGroup(i);
+            // Keep empty groups "expanded" for expand indicator workaround, see
+            // drawable/expand_indicator.xml
+            if (getChildrenCount(i) > 0) {
+                ls.collapseGroup(i);
+            }
         }
         ls.setSelection(0);
     }

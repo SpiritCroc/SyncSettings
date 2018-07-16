@@ -43,6 +43,11 @@
     <string name="sync_account">%1$s (%2$s)</string><!-- 1: name, 2: account -->
     <string name="sync_account_detailed">%1$s - %2$s</string>
     <string name="sync_authority_detailed">%1$s (%2$s)</string>
+    <string name="sync_add_account">Add account</string>
+    <string name="sync_add_account_title">@string/sync_add_account</string>
+    <string name="sync_add_account_summary">Starting with Android 8.0, it is no longer possible to view a complete list of available accounts on a device. Instead, it is necessary to grant access to each single account so SyncSettings can see it. Continue to add an account to manage with SyncSettings.</string>
+    <string name="sync_add_account_continue">Continue</string>
+    <string name="sync_add_account_cancel">Cancel</string>
 
     <string name="sync_now">Request sync:</string>
     <string name="auto_sync">Auto sync:</string>

@@ -21,12 +21,15 @@ package de.spiritcroc.syncsettings;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -52,6 +55,7 @@ public class SelectSyncActivity extends AppCompatActivity {
 
     private static final int REQUEST_SELECT_ACTION = 1;
     private static final int REQUEST_PERMISSION_GET_ACCOUNTS = 2;
+    private static final int REQUEST_ACCOUNT = 3;
 
     private ExpandableListView listView;
     private SimpleCheckableExpandableListAdapter listAdapter;
@@ -65,6 +69,7 @@ public class SelectSyncActivity extends AppCompatActivity {
     private ArrayList<SyncListPos> initSelectedSyncPositions = new ArrayList<>();
 
     private boolean masterSyncGroupWasExpanded = false;
+    private int addAccountGroupPosition = -1;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -95,6 +100,13 @@ public class SelectSyncActivity extends AppCompatActivity {
                 }
 
                 return onSyncClick(groupPosition, childPosition, cb);
+            }
+        });
+        listView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition,
+                                        long id) {
+                return SelectSyncActivity.this.onGroupClick(groupPosition);
             }
         });
 
@@ -222,6 +234,11 @@ public class SelectSyncActivity extends AppCompatActivity {
                     finishWithResult(data);
                 }
                 break;
+            case REQUEST_ACCOUNT:
+                if (resultCode == RESULT_OK) {
+                    loadSyncs(true, null);
+                }
+                break;
             default:
                 Log.w(LOG_TAG, "onActivityResult: unhandled requestCode " + requestCode);
                 break;
@@ -347,11 +364,14 @@ public class SelectSyncActivity extends AppCompatActivity {
         final String CHILD = "CHILD_NAME";
 
         List<Map<String, String>> groupData = new ArrayList<Map<String, String>>() {{
+            // Count addIndex to track which position some groups are for direct actions
+            int addIndex = 0;
             if (!multiSelectMode) {
                 // Add master sync group:
                 add(new HashMap<String, String>() {{
                     put(ROOT, getString(R.string.sync_master));
                 }});
+                addIndex++;
             }
             // Add accounts:
             for (int i = 0; i < groups.size(); i++) {
@@ -360,6 +380,17 @@ public class SelectSyncActivity extends AppCompatActivity {
                     put(ROOT, Util.accountToReadableString(SelectSyncActivity.this, groups.get(j),
                             detailedInformation));
                 }});
+            }
+            // Accounts don't need to track addIndex, so once when done is enough
+            addIndex += groups.size();
+            // Add entry to add new accounts on devices starting with Oreo
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                add(new HashMap<String, String>() {{
+                    put(ROOT, getString(R.string.sync_add_account));
+                }});
+                addAccountGroupPosition = addIndex++;
+            } else {
+                addAccountGroupPosition = -1;
             }
         }};
 
@@ -415,6 +446,11 @@ public class SelectSyncActivity extends AppCompatActivity {
             listOfChildGroups.add(childGroup);
         }
 
+        if (addAccountGroupPosition != -1) {
+            // Add an empty group: we want to handle clicks on that group directly
+            listOfChildGroups.add(new ArrayList<Map<String, String>>());
+        }
+
         int itemLayoutId = multiSelectMode ? R.layout.checkable_expandable_list_item :
                 android.R.layout.simple_expandable_list_item_1;
         listAdapter = new SimpleCheckableExpandableListAdapter(
@@ -451,6 +487,9 @@ public class SelectSyncActivity extends AppCompatActivity {
                     }
                     @Override
                     public int getTextColorForGroup(int groupPosition) {
+                        if (groupPosition == addAccountGroupPosition) {
+                            return getResources().getColor(R.color.action_group_text_color);
+                        }
                         return getResources().getColor(R.color.group_text_color);
                     }
                 },
@@ -487,6 +526,10 @@ public class SelectSyncActivity extends AppCompatActivity {
         } else if (!initExpandedGroups.isEmpty()) {
             listAdapter.restoreExpandedGroups(listView, initExpandedGroups, 0);
             listView.setSelection(initExpandedGroups.get(0));
+        } else {
+            // restoreExpandedGroups also handles implied expanded state for empty groups
+            // see expand_indicator.xml for why this is needed
+            listAdapter.restoreExpandedGroups(listView, initExpandedGroups, 0);
         }
     }
 
@@ -592,6 +635,39 @@ public class SelectSyncActivity extends AppCompatActivity {
         updateChecker.update();
     }
 
+    private boolean onGroupClick(int groupPosition) {
+        if (groupPosition == addAccountGroupPosition) {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.sync_add_account_title)
+                    .setMessage(R.string.sync_add_account_summary)
+                    .setPositiveButton(R.string.sync_add_account_continue,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+                                        startActivityForResult(
+                                                AccountManager.newChooseAccountIntent(null, null,
+                                                        null, null, null, null, null),
+                                                REQUEST_ACCOUNT);
+                                    } else {
+                                        Log.e(LOG_TAG, "addAccountGroupPosition shown API "
+                                                + Build.VERSION.SDK_INT);
+                                    }
+                                }
+                            })
+                    .setNegativeButton(R.string.sync_add_account_cancel,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Only close dialog
+                                }
+                            })
+                    .show();
+            return true;
+        }
+        return false;
+    }
+
     private void selectAction(Sync sync) {
         Intent intent =
                 new Intent(SelectSyncActivity.this, SelectActionActivity.class);
@@ -660,6 +736,10 @@ public class SelectSyncActivity extends AppCompatActivity {
 
     private ArrayList<Sync> getSyncsForGroup(int groupPosition) {
         ArrayList<Sync> list = new ArrayList<>();
+        if (groupPosition >= groups.size()) {
+            // Irrelevant final entries: return empty list
+            return list;
+        }
         for (int i = 0; i < syncs.size(); i++) {
             if (syncs.get(i).account == null) {
                 // Irrelevant, master sync settings already checked

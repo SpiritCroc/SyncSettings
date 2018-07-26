@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class ShortcutActivity extends AppCompatActivity {
 
@@ -54,14 +55,21 @@ public class ShortcutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         if (createShortcut) {
-            // Create shortcut
-            setContentView(R.layout.activity_shortcut);
-            startActivityForResult(
-                    new Intent(getApplicationContext(), SelectSyncActivity.class),
-                    REQUEST_SHORTCUT
-            );
+            if (shouldLaunchShortcut()) {
+                // This only happens for bad shortcuts: show an error message
+                Toast.makeText(getApplicationContext(), R.string.toast_broken_shortcut,
+                        Toast.LENGTH_LONG).show();
+                finish();
+            } else {
+                // Create shortcut
+                setContentView(R.layout.activity_shortcut);
+                startActivityForResult(
+                        new Intent(getApplicationContext(), SelectSyncActivity.class),
+                        REQUEST_SHORTCUT
+                );
 
-            editShortcutText = (EditText) findViewById(R.id.edit_shortcut_name);
+                editShortcutText = (EditText) findViewById(R.id.edit_shortcut_name);
+            }
         } else {
             // Handle shortcut
             if (!Constants.ACTION_REQUEST_PERMISSIONS.equals(
@@ -70,6 +78,13 @@ public class ShortcutActivity extends AppCompatActivity {
             }
             Util.handleAction(this, intent);
         }
+    }
+
+    protected boolean shouldLaunchShortcut() {
+        // Historically, the same activity was used both for action selection and execution.
+        // This way, bad shortcuts are not easily detected, so let's use another activity for
+        // launching new shortcut actions, while retaining backwards compatibility
+        return false;
     }
 
     @Override
@@ -117,7 +132,7 @@ public class ShortcutActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SHORTCUT && resultCode == RESULT_OK) {
-            data.setClass(getApplicationContext(), ShortcutActivity.class);
+            data.setClass(getApplicationContext(), LaunchShortcutActivity.class);
             resultIntent = new Intent(Constants.INSTALL_SHORTCUT);
             resultIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, data);
             String shortcutName =

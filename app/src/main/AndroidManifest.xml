@@ -65,6 +65,17 @@
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
             </intent-filter>
         </activity>
+        <activity android:name="de.spiritcroc.syncsettings.LaunchShortcutActivity"
+            android:label="@string/app_name"
+            android:icon="@mipmap/ic_launcher"
+            android:theme="@style/TransparentTheme"
+            android:autoRemoveFromRecents="true"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <!-- Allow launch -->
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
         <receiver android:name="de.spiritcroc.syncsettings.BReceiver">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING"/>

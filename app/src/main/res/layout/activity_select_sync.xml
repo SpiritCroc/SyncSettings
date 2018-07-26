@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2015 SpiritCroc
+    Copyright (C) 2015-2018 SpiritCroc
     Email: spiritcroc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -17,12 +17,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SelectSyncActivity">
+
+    <TextView
+        android:id="@+id/missing_account_permission_text"
+        android:text="@string/account_access_denied_message"
+        android:visibility="gone"
+        android:theme="@style/InformationMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <ExpandableListView
         android:id="@+id/list_view"
@@ -30,4 +39,4 @@
         android:layout_height="match_parent"
         android:groupIndicator="@drawable/expand_indicator" />
 
-</RelativeLayout>
+</LinearLayout>

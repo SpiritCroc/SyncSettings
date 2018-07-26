@@ -24,7 +24,9 @@ import android.accounts.AccountManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -70,6 +72,8 @@ public class SelectSyncActivity extends AppCompatActivity {
 
     private boolean masterSyncGroupWasExpanded = false;
     private int addAccountGroupPosition = -1;
+
+    private boolean hasAccountsPermission = true;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -147,10 +151,47 @@ public class SelectSyncActivity extends AppCompatActivity {
             multiSelectSyncs = (ArrayList<Sync>) initSelectedSyncs.clone();
         }
 
-        loadSyncs(false, null);
+        updateHasAccountsPermission();
+        loadSyncs(null);
+        if (!hasAccountsPermission) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS},
+                    REQUEST_PERMISSION_GET_ACCOUNTS
+            );
+        }
 
         if (expandFirst) {
             listView.expandGroup(0);
+        }
+
+        // Missing account permission information view click listener
+        findViewById(R.id.missing_account_permission_text).setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                Uri.fromParts("package", getPackageName(), null))
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                    }
+                }
+        );
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (updateHasAccountsPermission()) {
+            loadSyncs(0);
+        }
+    }
+
+    private boolean updateHasAccountsPermission() {
+        boolean hasAccountsPermission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED;
+        if (hasAccountsPermission != this.hasAccountsPermission) {
+            this.hasAccountsPermission = hasAccountsPermission;
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -174,7 +215,8 @@ public class SelectSyncActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.findItem(R.id.next).setVisible(multiSelectMode && !multiSelectSyncs.isEmpty());
-        menu.findItem(R.id.multi_select).setChecked(multiSelectMode);
+        MenuItem multiSelect = menu.findItem(R.id.multi_select);
+        multiSelect.setChecked(multiSelectMode);
 
         menu.findItem(R.id.select_all).setVisible(multiSelectMode &&
                 multiSelectSyncs.size() < syncs.size());
@@ -186,8 +228,19 @@ public class SelectSyncActivity extends AppCompatActivity {
         menu.findItem(R.id.collapse_all).setVisible(listAdapter != null &&
                 !listAdapter.allGroupsCollapsed());
 
-        menu.findItem(R.id.detailed_information).setChecked(detailedInformation);
+        MenuItem detailed = menu.findItem(R.id.detailed_information);
+        detailed.setChecked(detailedInformation);
 
+        // Some options only make sense combined with account access
+        if (hasAccountsPermission) {
+            detailed.setVisible(true);
+            multiSelect.setVisible(true);
+        } else {
+            // If somehow default values were changed before account access was denied,
+            // still allow to return to default value
+            detailed.setVisible(detailedInformation);
+            multiSelect.setVisible(multiSelectMode);
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -201,7 +254,7 @@ public class SelectSyncActivity extends AppCompatActivity {
                 multiSelectMode = !multiSelectMode;
                 item.setChecked(multiSelectMode);
                 int groupOffset = multiSelectMode ? -1 : 1;
-                loadSyncs(false, groupOffset);
+                loadSyncs(groupOffset);
                 invalidateOptionsMenu();
                 return true;
             case R.id.select_all:
@@ -219,7 +272,7 @@ public class SelectSyncActivity extends AppCompatActivity {
             case R.id.detailed_information:
                 detailedInformation = !detailedInformation;
                 item.setChecked(detailedInformation);
-                loadSyncs(false, 0);
+                loadSyncs(0);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -236,7 +289,8 @@ public class SelectSyncActivity extends AppCompatActivity {
                 break;
             case REQUEST_ACCOUNT:
                 if (resultCode == RESULT_OK) {
-                    loadSyncs(true, null);
+                    updateHasAccountsPermission();
+                    loadSyncs(null);
                 }
                 break;
             default:
@@ -249,7 +303,8 @@ public class SelectSyncActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                           @NonNull int[] grantResults) {
         if (requestCode == REQUEST_PERMISSION_GET_ACCOUNTS) {
-            loadSyncs(true, null);
+            updateHasAccountsPermission();
+            loadSyncs(null);
         }
     }
 
@@ -262,16 +317,7 @@ public class SelectSyncActivity extends AppCompatActivity {
      * @param groupOffsetToPrevious
      * Null if no previous state or new state not describable using offset to previous
      */
-    private void loadSyncs(boolean skipPermissionCheck, Integer groupOffsetToPrevious) {
-        // Permission to read accounts required
-        if (!skipPermissionCheck &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) !=
-                        PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS},
-                    REQUEST_PERMISSION_GET_ACCOUNTS
-            );
-            return;
-        }
+    private void loadSyncs(Integer groupOffsetToPrevious) {
 
         ArrayList<Integer> expandedGroups;
         int listPosition = 0, listPositionOffset = 0;
@@ -331,12 +377,22 @@ public class SelectSyncActivity extends AppCompatActivity {
             }
         }
 
-        // Get user accounts
-        AccountManager accountManager = AccountManager.get(getApplicationContext());
-        Account[] accounts = accountManager.getAccounts();
+        Account[] accounts;
+        ArrayList<String> authorities;
+        if (hasAccountsPermission) {
+            // Get user accounts
+            AccountManager accountManager = AccountManager.get(getApplicationContext());
+            accounts = accountManager.getAccounts();
 
-        // Get authorities
-        ArrayList<String> authorities = Util.getAuthorities();
+            // Get authorities
+            authorities = Util.getAuthorities();
+        } else {
+            // Assume we can't see any accounts, because even if we do (because individual access
+            // was granted), we cannot operate on them
+            accounts = new Account[0];
+            authorities = new ArrayList<>();
+        }
+
 
         // Get available account/authority combinations
         if (DEBUG) Log.d(LOG_TAG, "Found accounts: " + accounts.length);
@@ -384,7 +440,8 @@ public class SelectSyncActivity extends AppCompatActivity {
             // Accounts don't need to track addIndex, so once when done is enough
             addIndex += groups.size();
             // Add entry to add new accounts on devices starting with Oreo
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (hasAccountsPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // Add account only makes sense when we have permission to read accounts
                 add(new HashMap<String, String>() {{
                     put(ROOT, getString(R.string.sync_add_account));
                 }});
@@ -531,6 +588,11 @@ public class SelectSyncActivity extends AppCompatActivity {
             // see expand_indicator.xml for why this is needed
             listAdapter.restoreExpandedGroups(listView, initExpandedGroups, 0);
         }
+
+        // Show message if account access was denied
+        findViewById(R.id.missing_account_permission_text).setVisibility(hasAccountsPermission
+                ? View.GONE
+                : View.VISIBLE);
     }
 
     private boolean onSyncClick(int groupPosition, int childPosition, CheckBox cb) {

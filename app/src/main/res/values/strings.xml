@@ -76,6 +76,8 @@
     <string name="toast_an_error_occurred">Sync Settings: An error occurred</string>
     <string name="toast_broken_shortcut">Sync Settings: broken action</string>
 
+    <string name="account_access_denied_message">Account access denied. Sync Settings needs access to your accounts to allow you to control them individually.</string>
+
     <string name="about_html"><![CDATA[
         <style media=\"screen\" type=\"text/css\">
             body {

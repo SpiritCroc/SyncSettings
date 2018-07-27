@@ -41,7 +41,7 @@ import java.util.ArrayList;
 
 public abstract class Util {
     private static final String LOG_TAG = Util.class.getSimpleName();
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = BuildConfig.DEBUG && false;
 
     public static ArrayList<String> getAuthorities() {
         SyncAdapterType[] syncAdapterTypes = ContentResolver.getSyncAdapterTypes();
@@ -57,6 +57,7 @@ public abstract class Util {
     }
 
     public static void handleAction(Context context, Intent intent) {
+        intent = IntentAnonymizer.deanonymizeIntent(context, intent);
         String action;
         Account account;
         String authority;

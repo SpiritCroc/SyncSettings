@@ -214,6 +214,7 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void finishWithResult(Intent data) {
+        // Return unanonymous data: result only processed internally
         setResult(RESULT_OK, data);
         finish();
     }

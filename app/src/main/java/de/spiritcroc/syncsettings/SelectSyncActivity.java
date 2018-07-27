@@ -53,7 +53,7 @@ import java.util.Map;
 
 public class SelectSyncActivity extends AppCompatActivity {
     private static final String LOG_TAG = SelectSyncActivity.class.getSimpleName();
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = BuildConfig.DEBUG && false;
 
     private static final int REQUEST_SELECT_ACTION = 1;
     private static final int REQUEST_PERMISSION_GET_ACCOUNTS = 2;
@@ -116,7 +116,7 @@ public class SelectSyncActivity extends AppCompatActivity {
 
         boolean expandFirst = false;
 
-        Intent intent = getIntent();
+        Intent intent = IntentAnonymizer.deanonymizeIntent(this, getIntent());
         if (intent.hasExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE)) {
             // Create pre-selection from previous configuration
             Bundle localeBundle =
@@ -309,6 +309,7 @@ public class SelectSyncActivity extends AppCompatActivity {
     }
 
     private void finishWithResult(Intent data) {
+        data = IntentAnonymizer.anonymizeIntent(this, data);
         setResult(RESULT_OK, data);
         finish();
     }
@@ -758,8 +759,8 @@ public class SelectSyncActivity extends AppCompatActivity {
     }
 
     private void selectAction(Intent intent) {
-        Bundle localeBundle =
-                getIntent().getBundleExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE);
+        Bundle localeBundle = IntentAnonymizer.deanonymizeIntent(this, getIntent())
+                .getBundleExtra(com.twofortyfouram.locale.api.Intent.EXTRA_BUNDLE);
         String action =
                 localeBundle == null ? null : localeBundle.getString(Constants.EXTRA_ACTION);
         intent.putExtra(Constants.EXTRA_PREVIOUS_ACTION, action);

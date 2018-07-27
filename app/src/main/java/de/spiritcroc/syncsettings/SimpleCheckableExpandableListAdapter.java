@@ -38,7 +38,7 @@ import java.util.Map;
 public class SimpleCheckableExpandableListAdapter extends SimpleExpandableListAdapter {
     private static final String LOG_TAG =
             SimpleCheckableExpandableListAdapter.class.getSimpleName();
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = BuildConfig.DEBUG && false;
 
     private OnAdapterUpdateListener updateListener;
 

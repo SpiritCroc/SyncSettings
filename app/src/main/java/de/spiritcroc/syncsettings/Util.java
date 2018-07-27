@@ -354,7 +354,11 @@ public abstract class Util {
         } else if (detailed) {
             result = context.getString(R.string.sync_account_detailed, result, account.type);
         }
-        return context.getString(R.string.sync_account, account.name, result);
+        String accountName = account.name;
+        if (DemonstrationHelper.ENABLED) {
+            accountName = DemonstrationHelper.replaceAccountName(accountName);
+        }
+        return context.getString(R.string.sync_account, accountName, result);
     }
 
     public static String authorityToReadableString(Context context, String authority, boolean detailed) {

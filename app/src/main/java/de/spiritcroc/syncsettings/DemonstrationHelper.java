@@ -12,4 +12,12 @@ class DemonstrationHelper {
         return "maxmusterman@gmail.com".equals(account.name)
                 && !"dont.want.this.provider.to.show".equals(authority);
     }
+
+    static String replaceAccountName(String accountName) {
+        if ("wantthisaccount@replaced.com".equals(accountName)) {
+            return "max.musterman@gmail.com";
+        } else {
+            return accountName;
+        }
+    }
 }

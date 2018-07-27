@@ -130,7 +130,9 @@ public class SelectActionActivity extends AppCompatActivity implements View.OnCl
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(account == null ? getString(R.string.activity_select_action) :
-                    account.name);
+                    (DemonstrationHelper.ENABLED
+                            ? DemonstrationHelper.replaceAccountName(account.name)
+                            : account.name));
         }
     }
 

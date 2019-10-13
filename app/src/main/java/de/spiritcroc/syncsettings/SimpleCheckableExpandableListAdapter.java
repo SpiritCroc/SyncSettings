@@ -20,7 +20,7 @@ package de.spiritcroc.syncsettings;
 
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
